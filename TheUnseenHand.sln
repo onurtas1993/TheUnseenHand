@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37614.0 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheUnseenHand", "TheUnseenHand\TheUnseenHand.csproj", "{65F66F13-588B-4BDD-9039-8D9B843B49C5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D5E44DB3-EE65-7EB1-9B43-FA8B330600FD} = {D5E44DB3-EE65-7EB1-9B43-FA8B330600FD}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameKeystrokes", "GameKeystrokes\GameKeystrokes.csproj", "{D5E44DB3-EE65-7EB1-9B43-FA8B330600FD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{65F66F13-588B-4BDD-9039-8D9B843B49C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65F66F13-588B-4BDD-9039-8D9B843B49C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65F66F13-588B-4BDD-9039-8D9B843B49C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65F66F13-588B-4BDD-9039-8D9B843B49C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5E44DB3-EE65-7EB1-9B43-FA8B330600FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5E44DB3-EE65-7EB1-9B43-FA8B330600FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5E44DB3-EE65-7EB1-9B43-FA8B330600FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5E44DB3-EE65-7EB1-9B43-FA8B330600FD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8085CDD8-6753-4828-BCCE-068A45BC32A3}
+	EndGlobalSection
+EndGlobal

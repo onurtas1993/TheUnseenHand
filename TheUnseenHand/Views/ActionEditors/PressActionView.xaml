@@ -1,0 +1,16 @@
+<UserControl x:Class="TheUnseenHand.Views.ActionEditors.PressActionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="12"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Text="Key:"
+                   VerticalAlignment="Center"/>
+        <TextBox Grid.Column="2"
+                 Text="{Binding Key, UpdateSourceTrigger=PropertyChanged}"/>
+    </Grid>
+</UserControl>

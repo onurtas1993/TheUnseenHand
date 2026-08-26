@@ -1,0 +1,61 @@
+namespace GameKeystrokes;
+
+/// <summary>
+/// Common set-1 keyboard scan codes. Cast a custom scan code to this enum when needed.
+/// </summary>
+public enum ScanCode : ushort
+{
+    Escape = 0x01,
+    One = 0x02,
+    Two = 0x03,
+    Three = 0x04,
+    Four = 0x05,
+    Five = 0x06,
+    Six = 0x07,
+    Seven = 0x08,
+    Eight = 0x09,
+    Nine = 0x0A,
+    Zero = 0x0B,
+
+    Q = 0x10,
+    W = 0x11,
+    E = 0x12,
+    R = 0x13,
+    T = 0x14,
+    Y = 0x15,
+    U = 0x16,
+    I = 0x17,
+    O = 0x18,
+    P = 0x19,
+
+    A = 0x1E,
+    S = 0x1F,
+    D = 0x20,
+    F = 0x21,
+    G = 0x22,
+    H = 0x23,
+    J = 0x24,
+    K = 0x25,
+    L = 0x26,
+
+    Z = 0x2C,
+    X = 0x2D,
+    C = 0x2E,
+    V = 0x2F,
+    B = 0x30,
+    N = 0x31,
+    M = 0x32,
+
+    Enter = 0x1C,
+    LeftControl = 0x1D,
+    LeftShift = 0x2A,
+    RightShift = 0x36,
+    LeftAlt = 0x38,
+    Space = 0x39,
+
+    // These use the E0 extended-key prefix.
+    ArrowUp = 0x48,
+    ArrowLeft = 0x4B,
+    ArrowRight = 0x4D,
+    ArrowDown = 0x50
+}
