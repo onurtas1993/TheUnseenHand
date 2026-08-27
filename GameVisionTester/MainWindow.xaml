@@ -1,0 +1,150 @@
+﻿<Window x:Class="GameVisionTester.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="GameVision Tester"
+        Width="653"
+        Height="520"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="20">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="220"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- EXE -->
+        <StackPanel Grid.Row="0">
+
+            <TextBlock Text="Executable"/>
+
+            <TextBox x:Name="ExeTextBox"
+                     Text="KnightOnLine.exe"
+                     Margin="0,5,0,15"/>
+
+        </StackPanel>
+
+
+        <!-- COORDINATES -->
+        <!-- REGION SETTINGS -->
+        <StackPanel Grid.Row="1"
+            Orientation="Horizontal">
+
+            <StackPanel Margin="0,0,10,0">
+                <TextBlock Text="Anchor"/>
+
+                <ComboBox x:Name="AnchorComboBox"
+                  Width="110"
+                  SelectedIndex="1">
+
+                    <ComboBoxItem Content="TopLeft"/>
+                    <ComboBoxItem Content="TopCenter"/>
+                    <ComboBoxItem Content="TopRight"/>
+                    <ComboBoxItem Content="Center"/>
+                    <ComboBoxItem Content="BottomLeft"/>
+                    <ComboBoxItem Content="BottomCenter"/>
+                    <ComboBoxItem Content="BottomRight"/>
+
+                </ComboBox>
+            </StackPanel>
+
+
+            <StackPanel Margin="0,0,10,0">
+                <TextBlock Text="X"/>
+                <TextBox x:Name="XTextBox"
+                 Text="-100"
+                 Width="60"/>
+            </StackPanel>
+
+
+            <StackPanel Margin="0,0,10,0">
+                <TextBlock Text="Y"/>
+                <TextBox x:Name="YTextBox"
+                 Text="11"
+                 Width="60"/>
+            </StackPanel>
+
+
+            <StackPanel Margin="0,0,10,0">
+                <TextBlock Text="Width"/>
+                <TextBox x:Name="WidthTextBox"
+                 Text="200"
+                 Width="60"/>
+            </StackPanel>
+
+
+            <StackPanel>
+                <TextBlock Text="Height"/>
+                <TextBox x:Name="HeightTextBox"
+                 Text="18"
+                 Width="60"/>
+            </StackPanel>
+
+        </StackPanel>
+
+
+        <!-- CAPTURE -->
+        <Button Grid.Row="2"
+                Content="Preview Region"
+                Width="130"
+                Height="35"
+                HorizontalAlignment="Left"
+                Margin="0,15"
+                Click="CaptureButton_Click"/>
+        
+        <Button Grid.Row="2"
+                Content="Test Game State"
+                Width="130"
+                Height="35"
+                HorizontalAlignment="Left"
+                Margin="145,15,0,15"
+                Click="TestGameStateButton_Click"/>
+
+        <Button Grid.Row="2"
+                Content="Preview Processed Mob"
+                Width="160"
+                Height="35"
+                HorizontalAlignment="Left"
+                Margin="290,15,0,15"
+                Click="PreviewMobButton_Click"/>
+
+        <Button Grid.Row="2"
+                Content="Test Local AI"
+                Width="130"
+                Height="35"
+                HorizontalAlignment="Left"
+                Margin="464,15,0,15"
+                Click="TestLocalAIButton_Click"/>
+
+        <!-- PREVIEW -->
+        <Border Grid.Row="3"
+                BorderBrush="Gray"
+                BorderThickness="1"
+                Background="Black">
+
+            <Image x:Name="PreviewImage"
+                   Stretch="Uniform"/>
+
+        </Border>
+
+
+        <!-- OCR RESULT -->
+        <StackPanel Grid.Row="4"
+                    Margin="0,15,0,0">
+
+            <TextBlock Text="Read Value"
+                       FontWeight="Bold"/>
+
+            <TextBox x:Name="ResultTextBox"
+                     IsReadOnly="True"
+                     FontSize="18"
+                     Margin="0,5,0,0"/>
+
+        </StackPanel>
+
+    </Grid>
+
+</Window>

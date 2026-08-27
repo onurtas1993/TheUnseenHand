@@ -11,13 +11,17 @@
         WindowStartupLocation="CenterScreen">
 
     <Grid Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="34*"/>
+            <RowDefinition Height="63*"/>
+        </Grid.RowDefinitions>
 
         <!-- Main background -->
         <Image Source="/Assets/background.png"
                Stretch="Fill"
-               IsHitTestVisible="False"/>
+               IsHitTestVisible="False" Grid.RowSpan="2"/>
 
-        <Canvas>
+        <Canvas Grid.RowSpan="2">
 
             <!-- Title -->
             <TextBlock Text="The Unseen Hand"
@@ -293,7 +297,6 @@
         <!-- Full-width invisible drag area -->
         <Border Height="70"
                 VerticalAlignment="Top"
-                HorizontalAlignment="Stretch"
                 Background="Transparent"
                 MouseLeftButtonDown="DragArea_MouseLeftButtonDown"/>
 

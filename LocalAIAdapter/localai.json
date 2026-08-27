@@ -1,0 +1,8 @@
+{
+  "BaseUrl": "http://localhost:1234/v1",
+  "Model": "glm-ocr",
+  "ApiKey": null,
+  "MaxTokens": 1024,
+  "Temperature": 0.0,
+  "TimeoutSeconds": 60
+}
