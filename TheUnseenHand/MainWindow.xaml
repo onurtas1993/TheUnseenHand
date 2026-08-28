@@ -55,6 +55,52 @@
                      Canvas.Left="50"
                      Canvas.Top="113" HorizontalAlignment="Center" VerticalAlignment="Top"/>
 
+            <Button Content="▲"
+                    Click="MoveActionUpButton_Click"
+                    Foreground="White"
+                    FontSize="13"
+                    Width="30"
+                    Height="30"
+                    Canvas.Left="385"
+                    Canvas.Top="113">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Image x:Name="img" Source="/Assets/unclicked_button.png" Stretch="Fill"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="img" Property="Source" Value="/Assets/clicked_button.png"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+            <Button Content="▼"
+                    Click="MoveActionDownButton_Click"
+                    Foreground="White"
+                    FontSize="13"
+                    Width="30"
+                    Height="30"
+                    Canvas.Left="385"
+                    Canvas.Top="149">
+                <Button.Template>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Image x:Name="img" Source="/Assets/unclicked_button.png" Stretch="Fill"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="img" Property="Source" Value="/Assets/clicked_button.png"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
             <!-- ======================== -->
             <!-- ACTION BUTTONS           -->
             <!-- ======================== -->

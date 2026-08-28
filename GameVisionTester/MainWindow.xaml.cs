@@ -101,59 +101,10 @@ public partial class MainWindow : Window
 
             ResultTextBox.Text =
                 $"HP: {state.PlayerHP}/{state.PlayerMaxHP}    " +
-                $"MP: {state.PlayerMP}/{state.PlayerMaxMP}    " +
-                $"Mob: {state.CurrentMob}";
+                $"MP: {state.PlayerMP}/{state.PlayerMaxMP}";
         }
         catch (Exception ex)
         {
-            ResultTextBox.Text = ex.Message;
-        }
-    }
-
-    private async void PreviewMobButton_Click(
-    object sender,
-    RoutedEventArgs e)
-    {
-        try
-        {
-            var selectedItem =
-                (ComboBoxItem)AnchorComboBox.SelectedItem;
-
-            var anchor =
-                Enum.Parse<ScreenAnchor>(
-                    selectedItem.Content.ToString()!);
-
-            var region = new ScreenRegion
-            {
-                Anchor = anchor,
-                X = int.Parse(XTextBox.Text),
-                Y = int.Parse(YTextBox.Text),
-                Width = int.Parse(WidthTextBox.Text),
-                Height = int.Parse(HeightTextBox.Text)
-            };
-
-            ResultTextBox.Text =
-                "Switch to the game... capturing in 3 seconds.";
-
-            await Task.Delay(3000);
-
-            var reader = new GameVisionReader();
-
-            using var result = reader.ReadMobRegion(
-                ExeTextBox.Text.Trim(),
-                region);
-
-            PreviewImage.Source =
-                BitmapToImageSource(result.Preview);
-
-            ResultTextBox.Text =
-                string.IsNullOrWhiteSpace(result.Text)
-                    ? "(OCR returned no text)"
-                    : result.Text;
-        }
-        catch (Exception ex)
-        {
-            PreviewImage.Source = null;
             ResultTextBox.Text = ex.Message;
         }
     }
@@ -189,24 +140,24 @@ public partial class MainWindow : Window
                 new GameVisionReader();
 
             using var capture =
-                vision.ReadRegion(
+                vision.CaptureRegion(
                     ExeTextBox.Text.Trim(),
                     region);
-
-            PreviewImage.Source =
-                BitmapToImageSource(capture.Preview);
 
             byte[] imageBytes;
 
             using (var stream = new MemoryStream())
             {
-                capture.Preview.Save(
+                capture.Save(
                     stream,
                     System.Drawing.Imaging.ImageFormat.Png);
 
                 imageBytes =
                     stream.ToArray();
             }
+
+            PreviewImage.Source =
+                PngToImageSource(imageBytes);
 
             const string prompt = """
 Return only the text visible in this image.
@@ -236,6 +187,20 @@ Rules:
             ResultTextBox.Text =
                 $"{ex.GetType().Name}: {ex.Message}";
         }
+    }
+
+    private static BitmapImage PngToImageSource(byte[] pngBytes)
+    {
+        using var stream = new MemoryStream(pngBytes, writable: false);
+        var image = new BitmapImage();
+
+        image.BeginInit();
+        image.CacheOption = BitmapCacheOption.OnLoad;
+        image.StreamSource = stream;
+        image.EndInit();
+        image.Freeze();
+
+        return image;
     }
 
 }

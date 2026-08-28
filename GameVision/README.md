@@ -12,10 +12,11 @@ var hp = state.PlayerHP;
 var maxHp = state.PlayerMaxHP;
 var mp = state.PlayerMP;
 var maxMp = state.PlayerMaxMP;
-var mob = state.CurrentMob;
 ```
 
-`ReadGameState()` verifies that the focused window belongs to the executable configured in `gamevision.json`, captures its client area, crops the configured HP/MP/mob-name rectangles, and returns one state snapshot.
+`ReadGameState()` verifies that the focused window belongs to the executable configured in `gamevision.json`, captures its client area, reads the configured HP/MP rectangles, and returns one vitals snapshot.
+
+Use `CaptureRegion()` when an external vision model needs the untouched pixels from a screen region. `CaptureMobRegion()` does the same using the configured executable and mob-name region. These methods only capture and crop; they do not preprocess the image or run Windows OCR.
 
 ## Configuration
 

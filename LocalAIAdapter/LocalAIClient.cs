@@ -1,5 +1,5 @@
+using System.Net;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace LocalAIAdapter;
@@ -19,7 +19,7 @@ public sealed class LocalAIClient : IDisposable
     {
         _config = config ?? throw new ArgumentNullException(nameof(config));
         _ownsHttpClient = httpClient is null;
-        _httpClient = httpClient ?? new HttpClient();
+        _httpClient = httpClient ?? CreateHttpClient(config);
         _httpClient.Timeout = TimeSpan.FromSeconds(_config.TimeoutSeconds);
 
         if (!string.IsNullOrWhiteSpace(_config.ApiKey))
@@ -92,11 +92,28 @@ public sealed class LocalAIClient : IDisposable
             stream = false
         };
 
-        var endpoint = $"{_config.BaseUrl.TrimEnd('/')}/chat/completions";
+        var endpoint = BuildEndpoint(_config.BaseUrl, "chat/completions");
 
-        using var response = await _httpClient.PostAsJsonAsync(
-            endpoint,
-            request,
+        byte[] requestBytes = JsonSerializer.SerializeToUtf8Bytes(request);
+
+        using var requestMessage = new HttpRequestMessage(HttpMethod.Post, endpoint)
+        {
+            Content = new ByteArrayContent(requestBytes),
+            Version = HttpVersion.Version11,
+            VersionPolicy = HttpVersionPolicy.RequestVersionExact
+        };
+
+        requestMessage.Content.Headers.ContentType =
+            new MediaTypeHeaderValue("application/json")
+            {
+                CharSet = "utf-8"
+            };
+
+        requestMessage.Headers.ExpectContinue = false;
+
+        using var response = await _httpClient.SendAsync(
+            requestMessage,
+            HttpCompletionOption.ResponseHeadersRead,
             cancellationToken);
 
         var responseText = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -137,6 +154,46 @@ public sealed class LocalAIClient : IDisposable
         return await AnalyzeImageAsync(bytes, prompt, mimeType, cancellationToken);
     }
 
+    public async Task EnsureModelAvailableAsync(
+        CancellationToken cancellationToken = default)
+    {
+        Uri endpoint = BuildEndpoint(_config.BaseUrl, "models");
+        using var request = new HttpRequestMessage(HttpMethod.Get, endpoint)
+        {
+            Version = HttpVersion.Version11,
+            VersionPolicy = HttpVersionPolicy.RequestVersionExact
+        };
+
+        using HttpResponseMessage response = await _httpClient.SendAsync(
+            request,
+            HttpCompletionOption.ResponseHeadersRead,
+            cancellationToken);
+        string responseText = await response.Content.ReadAsStringAsync(cancellationToken);
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new HttpRequestException(
+                $"LM Studio returned HTTP {(int)response.StatusCode} ({response.StatusCode}): {responseText}");
+        }
+
+        using JsonDocument document = JsonDocument.Parse(responseText);
+        if (!document.RootElement.TryGetProperty("data", out JsonElement models) ||
+            models.ValueKind != JsonValueKind.Array)
+        {
+            throw new InvalidOperationException("LM Studio did not return a valid model list.");
+        }
+
+        bool found = models.EnumerateArray().Any(model =>
+            model.TryGetProperty("id", out JsonElement id) &&
+            string.Equals(id.GetString(), _config.Model, StringComparison.OrdinalIgnoreCase));
+
+        if (!found)
+        {
+            throw new InvalidOperationException(
+                $"The configured Local AI model '{_config.Model}' is not loaded in LM Studio.");
+        }
+    }
+
     private static string GetMimeType(string imagePath)
     {
         return Path.GetExtension(imagePath).ToLowerInvariant() switch
@@ -152,4 +209,34 @@ public sealed class LocalAIClient : IDisposable
         if (_ownsHttpClient)
             _httpClient.Dispose();
     }
+
+    private static HttpClient CreateHttpClient(LocalAIConfig config)
+    {
+        var handler = new SocketsHttpHandler();
+
+        if (Uri.TryCreate(config.BaseUrl, UriKind.Absolute, out Uri? baseUri) &&
+            baseUri.IsLoopback)
+        {
+            handler.UseProxy = false;
+        }
+
+        return new HttpClient(handler, disposeHandler: true);
+    }
+
+    private static Uri BuildEndpoint(string baseUrl, string relativePath)
+    {
+        var builder = new UriBuilder(
+            $"{baseUrl.TrimEnd('/')}/{relativePath.TrimStart('/')}");
+
+        if (string.Equals(
+                builder.Host,
+                "localhost",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            builder.Host = "127.0.0.1";
+        }
+
+        return builder.Uri;
+    }
+
 }

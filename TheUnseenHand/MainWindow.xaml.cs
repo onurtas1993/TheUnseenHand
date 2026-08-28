@@ -65,6 +65,28 @@ public partial class MainWindow : Window
         {
             selectedAction.Type = editor.Result.Type;
             selectedAction.Value = editor.Result.Value;
+            selectedAction.Condition = editor.Result.Condition;
+            selectedAction.Actions = editor.Result.Actions;
         }
+    }
+
+    private void MoveActionUpButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel { SelectedAction: not null } viewModel)
+            return;
+
+        int index = viewModel.Actions.IndexOf(viewModel.SelectedAction);
+        if (index > 0)
+            viewModel.Actions.Move(index, index - 1);
+    }
+
+    private void MoveActionDownButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainViewModel { SelectedAction: not null } viewModel)
+            return;
+
+        int index = viewModel.Actions.IndexOf(viewModel.SelectedAction);
+        if (index >= 0 && index < viewModel.Actions.Count - 1)
+            viewModel.Actions.Move(index, index + 1);
     }
 }

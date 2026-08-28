@@ -11,11 +11,11 @@ public partial class ActionEditorWindow : Window
 
     public MacroAction? Result { get; private set; }
 
-    public ActionEditorWindow(MacroAction? action = null)
+    public ActionEditorWindow(MacroAction? action = null, bool allowIf = true)
     {
         InitializeComponent();
 
-        _viewModel = new ActionEditorViewModel(action);
+        _viewModel = new ActionEditorViewModel(action, allowIf);
         DataContext = _viewModel;
     }
 

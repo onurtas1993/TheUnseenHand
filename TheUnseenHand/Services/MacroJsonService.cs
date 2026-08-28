@@ -50,14 +50,25 @@ public class MacroJsonService : IMacroJsonService
         AppSettings settings = JsonSerializer.Deserialize<AppSettings>(json, _options)
             ?? throw new InvalidDataException("The settings file is empty or invalid.");
 
-        if (settings.SchemaVersion != 1)
+        if (settings.SchemaVersion is not (1 or 2))
             throw new InvalidDataException(
                 $"Unsupported settings schema version: {settings.SchemaVersion}.");
 
         settings.Target ??= new TargetSettings();
         settings.Macro ??= new MacroSettings();
         settings.Macro.Actions ??= new List<MacroAction>();
+        NormalizeActions(settings.Macro.Actions);
+        settings.SchemaVersion = 2;
 
         return settings;
+    }
+
+    private static void NormalizeActions(IEnumerable<MacroAction> actions)
+    {
+        foreach (MacroAction action in actions)
+        {
+            action.Actions ??= new List<MacroAction>();
+            NormalizeActions(action.Actions);
+        }
     }
 }

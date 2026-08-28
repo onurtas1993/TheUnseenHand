@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:actionEditors="clr-namespace:TheUnseenHand.ViewModels.ActionEditors"
         xmlns:actionEditorViews="clr-namespace:TheUnseenHand.Views.ActionEditors"
-        Title="Action Editor" Foreground="White" Width="400" Height="300"
+        Title="Action Editor" Foreground="White" Width="540" Height="430"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
 
@@ -13,6 +13,9 @@
         </DataTemplate>
         <DataTemplate DataType="{x:Type actionEditors:WaitActionViewModel}">
             <actionEditorViews:WaitActionView/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type actionEditors:IfActionViewModel}">
+            <actionEditorViews:IfActionView/>
         </DataTemplate>
  
         <Style x:Key="ImageButtonStyle" TargetType="Button">

@@ -3,5 +3,6 @@
 public enum MacroActionType
 {
     Press,
-    Wait
+    Wait,
+    If
 }

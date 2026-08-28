@@ -6,7 +6,7 @@ namespace GameVision;
 public sealed class GameVisionReader
 {
     private readonly GameVisionConfig _config;
-    private readonly WindowsOcrReader _ocr = new();
+    private readonly Lazy<WindowsOcrReader> _ocr = new();
 
     public GameVisionReader(
         string configPath = "gamevision.json")
@@ -31,28 +31,17 @@ public sealed class GameVisionReader
                 frame,
                 _config.MpRegion);
 
-        using var mobCrop =
-            ImageProcessor.Crop(
-                frame,
-                _config.MobNameRegion);
-
         using var hpPrepared =
             ImageProcessor.PrepareVital(hpCrop);
 
         using var mpPrepared =
             ImageProcessor.PrepareVital(mpCrop);
 
-        using var mobPrepared =
-            ImageProcessor.PrepareMobName(mobCrop);
-
         var hp =
-            _ocr.ReadVital(hpPrepared);
+            _ocr.Value.ReadVital(hpPrepared);
 
         var mp =
-            _ocr.ReadVital(mpPrepared);
-
-        var mob =
-            _ocr.ReadMobName(mobPrepared);
+            _ocr.Value.ReadVital(mpPrepared);
 
         return new GameState
         {
@@ -60,62 +49,45 @@ public sealed class GameVisionReader
             PlayerMaxHP = hp.Maximum,
 
             PlayerMP = mp.Current,
-            PlayerMaxMP = mp.Maximum,
-
-            CurrentMob = mob
+            PlayerMaxMP = mp.Maximum
         };
     }
 
     // Tester: raw region
+    public Bitmap CaptureRegion(
+        string executableName,
+        ScreenRegion region)
+    {
+        return ForegroundWindowCapture.CaptureRegion(
+            executableName,
+            region);
+    }
+
+    public Bitmap CaptureMobRegion()
+    {
+        return CaptureRegion(
+            _config.ExecutableName,
+            _config.MobNameRegion);
+    }
+
+    // Tester: raw region with Windows OCR
     public RegionReadResult ReadRegion(
         string executableName,
         ScreenRegion region)
     {
-        using var frame =
-            ForegroundWindowCapture.Capture(
-                executableName);
-
-        using var crop =
-            ImageProcessor.Crop(
-                frame,
-                region);
+        using var crop = CaptureRegion(
+            executableName,
+            region);
 
         var preview =
             new Bitmap(crop);
 
         var text =
-            _ocr.Recognize(crop);
+            _ocr.Value.Recognize(crop);
 
         return new RegionReadResult(
             preview,
             text);
     }
 
-    // Tester: processed mob region
-    public RegionReadResult ReadMobRegion(
-        string executableName,
-        ScreenRegion region)
-    {
-        using var frame =
-            ForegroundWindowCapture.Capture(
-                executableName);
-
-        using var crop =
-            ImageProcessor.Crop(
-                frame,
-                region);
-
-        using var prepared =
-            ImageProcessor.PrepareMobName(crop);
-
-        var preview =
-            new Bitmap(prepared);
-
-        var text =
-            _ocr.Recognize(prepared);
-
-        return new RegionReadResult(
-            preview,
-            text);
-    }
 }

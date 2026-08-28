@@ -104,19 +104,11 @@
                 Click="TestGameStateButton_Click"/>
 
         <Button Grid.Row="2"
-                Content="Preview Processed Mob"
-                Width="160"
-                Height="35"
-                HorizontalAlignment="Left"
-                Margin="290,15,0,15"
-                Click="PreviewMobButton_Click"/>
-
-        <Button Grid.Row="2"
                 Content="Test Local AI"
                 Width="130"
                 Height="35"
                 HorizontalAlignment="Left"
-                Margin="464,15,0,15"
+                Margin="290,15,0,15"
                 Click="TestLocalAIButton_Click"/>
 
         <!-- PREVIEW -->
@@ -126,7 +118,7 @@
                 Background="Black">
 
             <Image x:Name="PreviewImage"
-                   Stretch="Uniform"/>
+                   Stretch="None"/>
 
         </Border>
 

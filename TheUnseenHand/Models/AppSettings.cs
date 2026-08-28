@@ -2,7 +2,7 @@ namespace TheUnseenHand.Models;
 
 public sealed class AppSettings
 {
-    public int SchemaVersion { get; set; } = 1;
+    public int SchemaVersion { get; set; } = 2;
     public TargetSettings Target { get; set; } = new();
     public MacroSettings Macro { get; set; } = new();
 }

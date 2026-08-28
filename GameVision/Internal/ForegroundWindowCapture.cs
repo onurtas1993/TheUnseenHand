@@ -42,6 +42,70 @@ internal static class ForegroundWindowCapture
         return bitmap;
     }
 
+    public static Bitmap CaptureRegion(
+        string executableName,
+        ScreenRegion region)
+    {
+        ArgumentNullException.ThrowIfNull(region);
+
+        using var frame = Capture(executableName);
+        Rectangle bounds = ResolveRegionBounds(frame.Size, region);
+
+        if (bounds.X < 0 || bounds.Y < 0 ||
+            bounds.Width <= 0 || bounds.Height <= 0 ||
+            bounds.Right > frame.Width || bounds.Bottom > frame.Height)
+        {
+            throw new InvalidOperationException(
+                "The configured capture region falls outside the game client area.");
+        }
+
+        return frame.Clone(bounds, frame.PixelFormat);
+    }
+
+    private static Rectangle ResolveRegionBounds(
+        Size frameSize,
+        ScreenRegion region)
+    {
+        int x;
+        int y;
+
+        switch (region.Anchor)
+        {
+            case ScreenAnchor.TopLeft:
+                x = region.X;
+                y = region.Y;
+                break;
+            case ScreenAnchor.TopCenter:
+                x = (frameSize.Width / 2) + region.X;
+                y = region.Y;
+                break;
+            case ScreenAnchor.TopRight:
+                x = frameSize.Width + region.X;
+                y = region.Y;
+                break;
+            case ScreenAnchor.Center:
+                x = (frameSize.Width / 2) + region.X;
+                y = (frameSize.Height / 2) + region.Y;
+                break;
+            case ScreenAnchor.BottomLeft:
+                x = region.X;
+                y = frameSize.Height + region.Y;
+                break;
+            case ScreenAnchor.BottomCenter:
+                x = (frameSize.Width / 2) + region.X;
+                y = frameSize.Height + region.Y;
+                break;
+            case ScreenAnchor.BottomRight:
+                x = frameSize.Width + region.X;
+                y = frameSize.Height + region.Y;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(region.Anchor));
+        }
+
+        return new Rectangle(x, y, region.Width, region.Height);
+    }
+
     [DllImport("user32.dll")]
     private static extern IntPtr GetForegroundWindow();
 

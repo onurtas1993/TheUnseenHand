@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GameKeystrokes\GameKeystrokes.csproj" />
     <ProjectReference Include="..\GameVision\GameVision.csproj" />
+    <ProjectReference Include="..\LocalAIAdapter\LocalAIAdapter.csproj" />
   </ItemGroup>
 
   <ItemGroup>
