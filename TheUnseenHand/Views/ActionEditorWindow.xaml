@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:actionEditors="clr-namespace:TheUnseenHand.ViewModels.ActionEditors"
         xmlns:actionEditorViews="clr-namespace:TheUnseenHand.Views.ActionEditors"
-        Title="Action Editor" Foreground="White" Width="540" Height="430"
+        Title="Action Editor" Foreground="White" Width="540" Height="570"
         WindowStyle="None" AllowsTransparency="True" Background="Transparent"
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
 

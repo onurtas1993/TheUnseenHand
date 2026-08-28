@@ -11,6 +11,7 @@ public sealed class IfActionViewModel : INotifyPropertyChanged
     private ComparisonOperator _operator = ComparisonOperator.LessThan;
     private string _comparisonValue = string.Empty;
     private MacroAction? _selectedAction;
+    private MacroAction? _selectedElseAction;
 
     public Array Sources { get; } = Enum.GetValues<ConditionSource>();
 
@@ -57,6 +58,7 @@ public sealed class IfActionViewModel : INotifyPropertyChanged
     }
 
     public ObservableCollection<MacroAction> Actions { get; } = new();
+    public ObservableCollection<MacroAction> ElseActions { get; } = new();
 
     public MacroAction? SelectedAction
     {
@@ -64,6 +66,16 @@ public sealed class IfActionViewModel : INotifyPropertyChanged
         set
         {
             _selectedAction = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public MacroAction? SelectedElseAction
+    {
+        get => _selectedElseAction;
+        set
+        {
+            _selectedElseAction = value;
             OnPropertyChanged();
         }
     }

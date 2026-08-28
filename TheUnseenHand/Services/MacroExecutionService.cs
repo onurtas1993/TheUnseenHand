@@ -126,7 +126,7 @@ public class MacroExecutionService : IMacroExecutionService
         MacroCondition condition = action.Condition
             ?? throw new InvalidOperationException("The IF action has no condition.");
 
-        if (action.Actions.Count == 0)
+        if (action.Actions.Count == 0 && action.ElseActions.Count == 0)
             return true;
 
         try
@@ -136,11 +136,10 @@ public class MacroExecutionService : IMacroExecutionService
                 string recognizedName =
                     await _mobRecognition.Value.RecognizeCurrentAsync(cancellationToken);
 
-                if (!CompareText(recognizedName, condition.Operator, condition.Value))
-                    return true;
-
                 return await ExecuteSequenceAsync(
-                    action.Actions,
+                    CompareText(recognizedName, condition.Operator, condition.Value)
+                        ? action.Actions
+                        : action.ElseActions,
                     processName,
                     cancellationToken);
             }
@@ -158,11 +157,10 @@ public class MacroExecutionService : IMacroExecutionService
                     $"Invalid numeric IF value: '{condition.Value}'.");
             }
 
-            if (!CompareNumber(actual, condition.Operator, expected))
-                return true;
-
             return await ExecuteSequenceAsync(
-                action.Actions,
+                CompareNumber(actual, condition.Operator, expected)
+                    ? action.Actions
+                    : action.ElseActions,
                 processName,
                 cancellationToken);
         }
@@ -220,7 +218,8 @@ public class MacroExecutionService : IMacroExecutionService
         return actions.Any(action =>
             action.Type == MacroActionType.If &&
             (action.Condition?.Source == ConditionSource.CurrentMob ||
-             ContainsMobCondition(action.Actions)));
+             ContainsMobCondition(action.Actions) ||
+             ContainsMobCondition(action.ElseActions)));
     }
 
     private static async Task WaitForForegroundAsync(

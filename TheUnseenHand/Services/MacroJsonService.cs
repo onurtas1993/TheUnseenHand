@@ -55,6 +55,7 @@ public class MacroJsonService : IMacroJsonService
         foreach (MacroAction action in actions)
         {
             action.Actions ??= new List<MacroAction>();
+            action.ElseActions ??= new List<MacroAction>();
 
             if (action.Type == MacroActionType.Press &&
                 action.DurationMilliseconds is < 1 or > 60_000)
@@ -64,6 +65,7 @@ public class MacroJsonService : IMacroJsonService
             }
 
             NormalizeActions(action.Actions);
+            NormalizeActions(action.ElseActions);
         }
     }
 }

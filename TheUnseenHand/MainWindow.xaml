@@ -62,8 +62,8 @@
                     FontSize="13"
                     Width="30"
                     Height="30"
-                    Canvas.Left="385"
-                    Canvas.Top="113">
+                    Canvas.Left="310"
+                    Canvas.Top="321" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Grid>
@@ -85,8 +85,8 @@
                     FontSize="13"
                     Width="30"
                     Height="30"
-                    Canvas.Left="385"
-                    Canvas.Top="149">
+                    Canvas.Left="350"
+                    Canvas.Top="321">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Grid>
@@ -109,15 +109,16 @@
             <Button Content="Add Action"
                     Click="AddActionButton_Click"
                     Foreground="White"
-                    Width="100"
-                    Height="40"
-                    Canvas.Left="58"
-                    Canvas.Top="316">
+                    Width="80"
+                    Height="30"
+                    Canvas.Left="50"
+                    Canvas.Top="321" HorizontalAlignment="Center" VerticalAlignment="Top">
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Grid>
-                            <Image x:Name="img"
+                            <Image x:Name="img" 
+                                   Stretch="Fill"
                                    Source="/Assets/unclicked_button.png"/>
 
                             <ContentPresenter
@@ -141,15 +142,16 @@
             <Button Content="Edit Action"
                     Click="EditActionButton_Click"
                     Foreground="White"
-                    Width="100"
-                    Height="40"
-                    Canvas.Left="163"
-                    Canvas.Top="316">
+                    Width="80"
+                    Height="30"
+                    Canvas.Left="135"
+                    Canvas.Top="321" HorizontalAlignment="Left" VerticalAlignment="Top">
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Grid>
                             <Image x:Name="img"
+                                   Stretch="Fill"
                                    Source="/Assets/unclicked_button.png"/>
 
                             <ContentPresenter
@@ -174,15 +176,16 @@
                     Command="{Binding RemoveCommand}"
                     CommandParameter="{Binding SelectedAction}"
                     Foreground="White"
-                    Width="100"
-                    Height="40"
-                    Canvas.Left="268"
-                    Canvas.Top="316">
+                    Width="80"
+                    Height="30"
+                    Canvas.Left="220"
+                    Canvas.Top="321" HorizontalAlignment="Left" VerticalAlignment="Top">
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Grid>
                             <Image x:Name="img"
+                                   Stretch="Fill"
                                    Source="/Assets/unclicked_button.png"/>
 
                             <ContentPresenter

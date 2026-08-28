@@ -4,9 +4,10 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="10"/>
+            <RowDefinition Height="8"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="8"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid>
@@ -17,29 +18,51 @@
                 <ColumnDefinition Width="8"/>
                 <ColumnDefinition Width="1.35*"/>
             </Grid.ColumnDefinitions>
-
-            <ComboBox ItemsSource="{Binding Sources}"
-                      SelectedItem="{Binding Source}"/>
-            <ComboBox Grid.Column="2"
-                      ItemsSource="{Binding Operators}"
+            <ComboBox ItemsSource="{Binding Sources}" SelectedItem="{Binding Source}"/>
+            <ComboBox Grid.Column="2" ItemsSource="{Binding Operators}"
                       SelectedItem="{Binding Operator}"/>
             <TextBox Grid.Column="4"
                      Text="{Binding ComparisonValue, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
 
-        <ListBox Grid.Row="2"
-                 ItemsSource="{Binding Actions}"
-                 SelectedItem="{Binding SelectedAction}"
-                 DisplayMemberPath="DisplayText"
-                 Background="#22000000"
-                 Foreground="White"/>
+        <GroupBox Grid.Row="2" Header="THEN" Foreground="White">
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ListBox ItemsSource="{Binding Actions}"
+                         SelectedItem="{Binding SelectedAction}"
+                         DisplayMemberPath="DisplayText"
+                         Background="#22000000" Foreground="White"/>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,0,0">
+                    <Button Content="Add" Width="58" Margin="0,0,5,0" Click="AddButton_Click"/>
+                    <Button Content="Edit" Width="58" Margin="0,0,5,0" Click="EditButton_Click"/>
+                    <Button Content="Remove" Width="64" Margin="0,0,5,0" Click="RemoveButton_Click"/>
+                    <Button Content="▲" Width="30" Margin="0,0,5,0" Click="MoveUpButton_Click"/>
+                    <Button Content="▼" Width="30" Click="MoveDownButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,8,0,0">
-            <Button Content="Add" Width="70" Margin="0,0,8,0" Click="AddButton_Click"/>
-            <Button Content="Edit" Width="70" Margin="0,0,8,0" Click="EditButton_Click"/>
-            <Button Content="Remove" Width="70" Margin="0,0,8,0" Click="RemoveButton_Click"/>
-            <Button Content="▲" Width="32" Margin="0,0,6,0" Click="MoveUpButton_Click"/>
-            <Button Content="▼" Width="32" Click="MoveDownButton_Click"/>
-        </StackPanel>
+        <GroupBox Grid.Row="4" Header="ELSE" Foreground="White">
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ListBox ItemsSource="{Binding ElseActions}"
+                         SelectedItem="{Binding SelectedElseAction}"
+                         DisplayMemberPath="DisplayText"
+                         Background="#22000000" Foreground="White"/>
+                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,0,0">
+                    <Button Content="Add" Width="58" Margin="0,0,5,0" Click="AddElseButton_Click"/>
+                    <Button Content="Edit" Width="58" Margin="0,0,5,0" Click="EditElseButton_Click"/>
+                    <Button Content="Remove" Width="64" Margin="0,0,5,0" Click="RemoveElseButton_Click"/>
+                    <Button Content="▲" Width="30" Margin="0,0,5,0" Click="MoveElseUpButton_Click"/>
+                    <Button Content="▼" Width="30" Click="MoveElseDownButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
     </Grid>
 </UserControl>

@@ -11,6 +11,7 @@ public class MacroAction : INotifyPropertyChanged
     private int _durationMilliseconds;
     private MacroCondition? _condition;
     private List<MacroAction> _actions = new();
+    private List<MacroAction> _elseActions = new();
 
     public MacroActionType Type
     {
@@ -77,6 +78,17 @@ public class MacroAction : INotifyPropertyChanged
         }
     }
 
+    public List<MacroAction> ElseActions
+    {
+        get => _elseActions;
+        set
+        {
+            _elseActions = value ?? new List<MacroAction>();
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(DisplayText));
+        }
+    }
+
     [JsonIgnore]
     public string DisplayText =>
         Type switch
@@ -86,7 +98,8 @@ public class MacroAction : INotifyPropertyChanged
             MacroActionType.Press => $"PRESS {Value}",
             MacroActionType.Wait => $"WAIT {Value} MS",
             MacroActionType.If when Condition is not null =>
-                $"IF {FormatSource(Condition.Source)} {FormatOperator(Condition.Operator)} {Condition.Value} THEN ({Actions.Count} ACTIONS)",
+                $"IF {FormatSource(Condition.Source)} {FormatOperator(Condition.Operator)} {Condition.Value} " +
+                $"THEN ({Actions.Count}) ELSE ({ElseActions.Count})",
             _ => $"{Type} {Value}"
         };
 

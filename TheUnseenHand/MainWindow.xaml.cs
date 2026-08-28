@@ -75,6 +75,7 @@ public partial class MainWindow : Window
             selectedAction.DurationMilliseconds = editor.Result.DurationMilliseconds;
             selectedAction.Condition = editor.Result.Condition;
             selectedAction.Actions = editor.Result.Actions;
+            selectedAction.ElseActions = editor.Result.ElseActions;
         }
     }
 

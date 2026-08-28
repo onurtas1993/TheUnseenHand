@@ -83,6 +83,9 @@ public class ActionEditorViewModel : INotifyPropertyChanged
                 : null,
             Actions = CurrentEditor is IfActionViewModel ifEditor
                 ? ifEditor.Actions.ToList()
+                : new List<MacroAction>(),
+            ElseActions = CurrentEditor is IfActionViewModel elseEditor
+                ? elseEditor.ElseActions.ToList()
                 : new List<MacroAction>()
         };
     }
@@ -122,6 +125,9 @@ public class ActionEditorViewModel : INotifyPropertyChanged
         {
             foreach (MacroAction child in action.Actions)
                 editor.Actions.Add(child);
+
+            foreach (MacroAction child in action.ElseActions)
+                editor.ElseActions.Add(child);
         }
 
         return editor;
