@@ -7,9 +7,7 @@ public sealed class GameVisionConfig
 {
     public string ExecutableName { get; set; } = string.Empty;
 
-    public ScreenRegion HpRegion { get; set; } = new();
-
-    public ScreenRegion MpRegion { get; set; } = new();
+    public ScreenRegion VitalsRegion { get; set; } = new();
 
     public ScreenRegion MobNameRegion { get; set; } = new();
 

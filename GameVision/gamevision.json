@@ -1,18 +1,11 @@
 {
   "ExecutableName": "KnightOnLine.exe",
-  "HpRegion": {
+  "VitalsRegion": {
     "Anchor": "TopLeft",
     "X": 80,
     "Y": 37,
     "Width": 90,
-    "Height": 11
-  },
-  "MpRegion": {
-    "Anchor": "TopLeft",
-    "X": 80,
-    "Y": 53,
-    "Width": 90,
-    "Height": 11
+    "Height": 27
   },
   "MobNameRegion": {
     "Anchor": "TopCenter",

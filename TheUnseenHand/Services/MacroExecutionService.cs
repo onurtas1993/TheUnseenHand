@@ -10,16 +10,14 @@ public class MacroExecutionService : IMacroExecutionService
 {
     private static readonly TimeSpan FocusPollInterval = TimeSpan.FromMilliseconds(50);
     private readonly Lazy<GameVisionReader> _vision;
-    private readonly Lazy<IMobRecognitionService> _mobRecognition;
 
-    public MacroExecutionService(
-        GameVisionReader? vision = null,
-        IMobRecognitionService? mobRecognition = null)
+    public event EventHandler<GameStateReadEventArgs>? GameStateRead;
+
+    public MacroExecutionService(GameVisionReader? vision = null)
     {
         _vision = new Lazy<GameVisionReader>(() => vision ?? new GameVisionReader(
-            Path.Combine(AppContext.BaseDirectory, "gamevision.json")));
-        _mobRecognition = new Lazy<IMobRecognitionService>(() =>
-            mobRecognition ?? new MobRecognitionService());
+            Path.Combine(AppContext.BaseDirectory, "gamevision.json"),
+            Path.Combine(AppContext.BaseDirectory, "localai.json")));
     }
 
     public async Task ExecuteAsync(
@@ -38,8 +36,8 @@ public class MacroExecutionService : IMacroExecutionService
         if (actionList.Length == 0)
             throw new InvalidOperationException("Add at least one action before starting.");
 
-        if (ContainsMobCondition(actionList))
-            await _mobRecognition.Value.EnsureAvailableAsync(cancellationToken);
+        if (ContainsVisionCondition(actionList))
+            await _vision.Value.EnsureAvailableAsync(cancellationToken);
 
         WindowTarget target = WindowTarget.FromProcessName(processName);
         await target.FocusAsync(cancellationToken: cancellationToken);
@@ -134,7 +132,7 @@ public class MacroExecutionService : IMacroExecutionService
             if (condition.Source == ConditionSource.CurrentMob)
             {
                 string recognizedName =
-                    await _mobRecognition.Value.RecognizeCurrentAsync(cancellationToken);
+                    await _vision.Value.ReadMobNameAsync(cancellationToken);
 
                 return await ExecuteSequenceAsync(
                     CompareText(recognizedName, condition.Operator, condition.Value)
@@ -144,7 +142,7 @@ public class MacroExecutionService : IMacroExecutionService
                     cancellationToken);
             }
 
-            GameState state = _vision.Value.ReadGameState();
+            GameVitals state = await _vision.Value.ReadVitalsAsync(cancellationToken);
             double actual = GetNumericValue(state, condition.Source);
 
             if (!double.TryParse(
@@ -157,8 +155,20 @@ public class MacroExecutionService : IMacroExecutionService
                     $"Invalid numeric IF value: '{condition.Value}'.");
             }
 
+            bool conditionResult = CompareNumber(actual, condition.Operator, expected);
+            GameStateRead?.Invoke(this, new GameStateReadEventArgs
+            {
+                PlayerHP = state.PlayerHP,
+                PlayerMaxHP = state.PlayerMaxHP,
+                PlayerMP = state.PlayerMP,
+                PlayerMaxMP = state.PlayerMaxMP,
+                Comparison = $"{FormatSource(condition.Source)} {actual:0.##} " +
+                             $"{FormatOperator(condition.Operator)} {expected:0.##}",
+                Result = conditionResult
+            });
+
             return await ExecuteSequenceAsync(
-                CompareNumber(actual, condition.Operator, expected)
+                conditionResult
                     ? action.Actions
                     : action.ElseActions,
                 processName,
@@ -170,7 +180,7 @@ public class MacroExecutionService : IMacroExecutionService
         }
     }
 
-    private static double GetNumericValue(GameState state, ConditionSource source) => source switch
+    private static double GetNumericValue(GameVitals state, ConditionSource source) => source switch
     {
         ConditionSource.PlayerHP => state.PlayerHP,
         ConditionSource.PlayerMaxHP => state.PlayerMaxHP,
@@ -201,8 +211,8 @@ public class MacroExecutionService : IMacroExecutionService
         string expected)
     {
         bool equals = string.Equals(
-            MobRecognitionService.NormalizeName(actual),
-            MobRecognitionService.NormalizeName(expected),
+            NormalizeText(actual),
+            NormalizeText(expected),
             StringComparison.OrdinalIgnoreCase);
 
         return comparison switch
@@ -213,13 +223,43 @@ public class MacroExecutionService : IMacroExecutionService
         };
     }
 
-    private static bool ContainsMobCondition(IEnumerable<MacroAction> actions)
+    private static string NormalizeText(string value)
+    {
+        return string.Join(
+            ' ',
+            value.Trim().Trim('"', '\'', '`')
+                .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
+    }
+
+    private static string FormatSource(ConditionSource source) => source switch
+    {
+        ConditionSource.PlayerHP => "HP",
+        ConditionSource.PlayerMaxHP => "MAX HP",
+        ConditionSource.PlayerHPPercent => "HP %",
+        ConditionSource.PlayerMP => "MP",
+        ConditionSource.PlayerMaxMP => "MAX MP",
+        ConditionSource.PlayerMPPercent => "MP %",
+        _ => source.ToString()
+    };
+
+    private static string FormatOperator(ComparisonOperator comparison) => comparison switch
+    {
+        ComparisonOperator.Equals => "=",
+        ComparisonOperator.NotEquals => "!=",
+        ComparisonOperator.LessThan => "<",
+        ComparisonOperator.LessThanOrEqual => "<=",
+        ComparisonOperator.GreaterThan => ">",
+        ComparisonOperator.GreaterThanOrEqual => ">=",
+        _ => comparison.ToString()
+    };
+
+    private static bool ContainsVisionCondition(IEnumerable<MacroAction> actions)
     {
         return actions.Any(action =>
             action.Type == MacroActionType.If &&
-            (action.Condition?.Source == ConditionSource.CurrentMob ||
-             ContainsMobCondition(action.Actions) ||
-             ContainsMobCondition(action.ElseActions)));
+            (action.Condition is not null ||
+             ContainsVisionCondition(action.Actions) ||
+             ContainsVisionCondition(action.ElseActions)));
     }
 
     private static async Task WaitForForegroundAsync(

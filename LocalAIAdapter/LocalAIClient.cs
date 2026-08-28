@@ -46,7 +46,8 @@ public sealed class LocalAIClient : IDisposable
         byte[] imageBytes,
         string prompt,
         string mimeType = "image/png",
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        object? responseFormat = null)
     {
         ArgumentNullException.ThrowIfNull(imageBytes);
 
@@ -61,10 +62,10 @@ public sealed class LocalAIClient : IDisposable
 
         var dataUrl = $"data:{mimeType};base64,{Convert.ToBase64String(imageBytes)}";
 
-        var request = new
+        var request = new Dictionary<string, object?>
         {
-            model = _config.Model,
-            messages = new object[]
+            ["model"] = _config.Model,
+            ["messages"] = new object[]
             {
                 new
                 {
@@ -87,10 +88,13 @@ public sealed class LocalAIClient : IDisposable
                     }
                 }
             },
-            temperature = _config.Temperature,
-            max_tokens = _config.MaxTokens,
-            stream = false
+            ["temperature"] = _config.Temperature,
+            ["max_tokens"] = _config.MaxTokens,
+            ["stream"] = false
         };
+
+        if (responseFormat is not null)
+            request["response_format"] = responseFormat;
 
         var endpoint = BuildEndpoint(_config.BaseUrl, "chat/completions");
 

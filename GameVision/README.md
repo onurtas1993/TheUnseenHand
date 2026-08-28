@@ -1,12 +1,15 @@
 # GameVision
 
-Small Windows class library for reading Knight Online HUD state from the currently focused game window.
+Windows vision boundary for capturing configured game regions and reading them with a LocalAIAdapter vision model.
 
 ## Public API
 
 ```csharp
-var vision = new GameVisionReader("gamevision.json");
-var state = vision.ReadGameState();
+using var vision = new GameVisionReader("gamevision.json", "localai.json");
+
+await vision.EnsureAvailableAsync();
+var state = await vision.ReadVitalsAsync();
+var mobName = await vision.ReadMobNameAsync();
 
 var hp = state.PlayerHP;
 var maxHp = state.PlayerMaxHP;
@@ -14,14 +17,14 @@ var mp = state.PlayerMP;
 var maxMp = state.PlayerMaxMP;
 ```
 
-`ReadGameState()` verifies that the focused window belongs to the executable configured in `gamevision.json`, captures its client area, reads the configured HP/MP rectangles, and returns one vitals snapshot.
+`ReadVitalsAsync()` and `ReadMobNameAsync()` verify that the focused window belongs to the configured executable, capture the relevant raw pixels, and send the PNG directly to LocalAIAdapter. GameVision owns both the screen-region configuration and the prompts/output parsing.
 
-Use `CaptureRegion()` when an external vision model needs the untouched pixels from a screen region. `CaptureMobRegion()` does the same using the configured executable and mob-name region. These methods only capture and crop; they do not preprocess the image or run Windows OCR.
+`CaptureRegion()`, `CaptureVitalsRegion()`, and `CaptureMobRegion()` expose the untouched cropped pixels for diagnostics. They do not resize, threshold, sharpen, or otherwise preprocess the image.
 
 ## Configuration
 
-`gamevision.json` contains absolute coordinates relative to the captured game client area. The included values are calibrated from the provided Knight Online view. There is no automatic coordinate scaling.
+`gamevision.json` contains absolute coordinates relative to the captured game client area. `localai.json` selects the Local AI endpoint and vision model. There is no automatic coordinate scaling.
 
-## OCR
+## Recognition
 
-Uses the OCR engine built into Windows. There is no Tesseract dependency, tessdata/model directory, downloader script, or bundled game screenshot.
+All text and numeric recognition is performed by the configured Local AI vision model. GameVision contains no Windows OCR or custom pixel-recognition pipeline.

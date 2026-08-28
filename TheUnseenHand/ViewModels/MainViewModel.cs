@@ -1,13 +1,15 @@
 ﻿using System.Collections.ObjectModel;
 using Microsoft.Win32;
 using System.IO;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using TheUnseenHand.Infrastructure;
 using TheUnseenHand.Models;
 using TheUnseenHand.Services;
 
 namespace TheUnseenHand.ViewModels;
 
-public class MainViewModel
+public class MainViewModel : INotifyPropertyChanged
 {
     private static readonly string SettingsDirectory = AppContext.BaseDirectory;
     private static readonly string DefaultSettingsPath =
@@ -18,10 +20,32 @@ public class MainViewModel
     private CancellationTokenSource? _executionCancellation;
     private string _targetProcessName = "notepad.exe";
     private bool _isLoadingSettings = true;
+    private string _latestVitals = "HP: -- / --    MP: -- / --";
+    private string _latestNumericCondition = "Last numeric IF: --";
 
     public ObservableCollection<MacroAction> Actions { get; } = new();
 
     public MacroAction? SelectedAction { get; set; }
+
+    public string LatestVitals
+    {
+        get => _latestVitals;
+        private set
+        {
+            _latestVitals = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string LatestNumericCondition
+    {
+        get => _latestNumericCondition;
+        private set
+        {
+            _latestNumericCondition = value;
+            OnPropertyChanged();
+        }
+    }
 
     public RelayCommand RemoveCommand { get; }
     public RelayCommand StartCommand { get; }
@@ -34,6 +58,7 @@ public class MainViewModel
         IMacroJsonService? macroJsonService = null)
     {
         _macroExecutionService = macroExecutionService ?? new MacroExecutionService();
+        _macroExecutionService.GameStateRead += MacroExecutionService_GameStateRead;
         _macroJsonService = macroJsonService ?? new MacroJsonService();
         RemoveCommand = new RelayCommand(Remove);
         StartCommand = new RelayCommand(
@@ -46,6 +71,25 @@ public class MainViewModel
         SaveCommand = new RelayCommand(_ => _ = SaveAsync(), _ => !_isLoadingSettings);
 
         _ = LoadDefaultAsync();
+    }
+
+    private void MacroExecutionService_GameStateRead(
+        object? sender,
+        GameStateReadEventArgs e)
+    {
+        void Apply()
+        {
+            LatestVitals =
+                $"HP: {e.PlayerHP} / {e.PlayerMaxHP}    " +
+                $"MP: {e.PlayerMP} / {e.PlayerMaxMP}";
+            LatestNumericCondition =
+                $"Last numeric IF: {e.Comparison} = {e.Result.ToString().ToUpperInvariant()}";
+        }
+
+        if (System.Windows.Application.Current.Dispatcher.CheckAccess())
+            Apply();
+        else
+            System.Windows.Application.Current.Dispatcher.Invoke(Apply);
     }
 
     private async Task StartAsync()
@@ -200,5 +244,12 @@ public class MainViewModel
         {
             Actions.Remove(action);
         }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

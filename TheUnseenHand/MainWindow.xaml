@@ -7,6 +7,7 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
+        Topmost="True"
         ResizeMode="NoResize"
         Closing="MainWindow_Closing"
         WindowStartupLocation="CenterScreen">
@@ -205,6 +206,24 @@
 
             </Button>
 
+
+            <TextBlock Text="{Binding LatestVitals}"
+                       Canvas.Left="50"
+                       Canvas.Top="374"
+                       Width="330"
+                       FontSize="15"
+                       FontWeight="SemiBold"
+                       Foreground="White"
+                       TextAlignment="Center"/>
+
+            <TextBlock Text="{Binding LatestNumericCondition}"
+                       Canvas.Left="50"
+                       Canvas.Top="399"
+                       Width="330"
+                       FontSize="13"
+                       Foreground="White"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"/>
 
             <!-- ======================== -->
             <!-- LOAD / SAVE              -->
