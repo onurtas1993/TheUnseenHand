@@ -8,6 +8,7 @@ public class MacroAction : INotifyPropertyChanged
 {
     private MacroActionType _type;
     private string _value = string.Empty;
+    private int _durationMilliseconds;
     private MacroCondition? _condition;
     private List<MacroAction> _actions = new();
 
@@ -39,6 +40,21 @@ public class MacroAction : INotifyPropertyChanged
         }
     }
 
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int DurationMilliseconds
+    {
+        get => _durationMilliseconds;
+        set
+        {
+            if (_durationMilliseconds == value)
+                return;
+
+            _durationMilliseconds = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(DisplayText));
+        }
+    }
+
     public MacroCondition? Condition
     {
         get => _condition;
@@ -65,12 +81,19 @@ public class MacroAction : INotifyPropertyChanged
     public string DisplayText =>
         Type switch
         {
+            MacroActionType.Press when DurationMilliseconds > 75 =>
+                $"HOLD {Value} FOR {FormatDuration(DurationMilliseconds)}",
             MacroActionType.Press => $"PRESS {Value}",
             MacroActionType.Wait => $"WAIT {Value} MS",
             MacroActionType.If when Condition is not null =>
                 $"IF {FormatSource(Condition.Source)} {FormatOperator(Condition.Operator)} {Condition.Value} THEN ({Actions.Count} ACTIONS)",
             _ => $"{Type} {Value}"
         };
+
+    private static string FormatDuration(int milliseconds) =>
+        milliseconds % 1000 == 0
+            ? $"{milliseconds / 1000} S"
+            : $"{milliseconds} MS";
 
     private static string FormatSource(ConditionSource source) => source switch
     {

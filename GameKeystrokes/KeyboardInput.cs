@@ -9,13 +9,39 @@ public static class KeyboardInput
         string key,
         CancellationToken cancellationToken = default)
     {
+        await HoldAsync(key, 75, null, cancellationToken);
+    }
+
+    public static async Task<bool> HoldAsync(
+        string key,
+        int durationMilliseconds,
+        Func<bool>? shouldContinue = null,
+        CancellationToken cancellationToken = default)
+    {
+        if (durationMilliseconds <= 0)
+            throw new ArgumentOutOfRangeException(
+                nameof(durationMilliseconds),
+                "Key duration must be greater than zero.");
+
         ScanCode scanCode = Parse(key);
 
         Send(scanCode, keyUp: false);
 
         try
         {
-            await Task.Delay(75, cancellationToken);
+            int remaining = durationMilliseconds;
+            while (remaining > 0)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                if (shouldContinue is not null && !shouldContinue())
+                    return false;
+
+                int delay = Math.Min(remaining, 25);
+                await Task.Delay(delay, cancellationToken).ConfigureAwait(false);
+                remaining -= delay;
+            }
+
+            return true;
         }
         finally
         {

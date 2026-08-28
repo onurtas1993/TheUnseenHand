@@ -86,8 +86,19 @@ public class MacroExecutionService : IMacroExecutionService
         switch (action.Type)
         {
             case MacroActionType.Press:
-                await KeyboardInput.TapAsync(action.Value, cancellationToken);
-                return true;
+                if (action.DurationMilliseconds is < 1 or > 60_000)
+                {
+                    throw new InvalidOperationException(
+                        "Key hold duration must be between 1 and 60000 ms.");
+                }
+
+                return await KeyboardInput.HoldAsync(
+                    action.Value,
+                    action.DurationMilliseconds,
+                    processName is null
+                        ? null
+                        : () => WindowTarget.IsProcessForeground(processName),
+                    cancellationToken);
 
             case MacroActionType.Wait:
                 if (processName is null)

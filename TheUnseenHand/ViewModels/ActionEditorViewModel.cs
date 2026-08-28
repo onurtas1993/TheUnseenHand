@@ -47,9 +47,21 @@ public class ActionEditorViewModel : INotifyPropertyChanged
 
     public MacroAction CreateAction()
     {
+        if (CurrentEditor is PressActionViewModel pressEditor)
+        {
+            if (string.IsNullOrWhiteSpace(pressEditor.Key))
+                throw new InvalidOperationException("Enter a key to press.");
+
+            if (pressEditor.DurationMilliseconds is < 1 or > 60_000)
+            {
+                throw new InvalidOperationException(
+                    "Key duration must be between 1 and 60000 milliseconds.");
+            }
+        }
+
         string value = CurrentEditor switch
         {
-            PressActionViewModel press => press.Key,
+            PressActionViewModel pressAction => pressAction.Key,
             WaitActionViewModel wait => wait.Milliseconds.ToString(),
             _ => string.Empty
         };
@@ -58,6 +70,9 @@ public class ActionEditorViewModel : INotifyPropertyChanged
         {
             Type = SelectedActionType,
             Value = value,
+            DurationMilliseconds = CurrentEditor is PressActionViewModel durationEditor
+                ? durationEditor.DurationMilliseconds
+                : 0,
             Condition = CurrentEditor is IfActionViewModel conditional
                 ? new MacroCondition
                 {
@@ -78,7 +93,10 @@ public class ActionEditorViewModel : INotifyPropertyChanged
         {
             MacroActionType.Press => new PressActionViewModel
             {
-                Key = action?.Value ?? string.Empty
+                Key = action?.Value ?? string.Empty,
+                DurationMilliseconds = action?.DurationMilliseconds > 0
+                    ? action.DurationMilliseconds
+                    : 75
             },
             MacroActionType.Wait => new WaitActionViewModel
             {

@@ -35,22 +35,10 @@ public class MacroJsonService : IMacroJsonService
 
         string json = await File.ReadAllTextAsync(filePath);
 
-        using JsonDocument document = JsonDocument.Parse(json);
-        if (document.RootElement.ValueKind == JsonValueKind.Array)
-        {
-            List<MacroAction> legacyActions =
-                JsonSerializer.Deserialize<List<MacroAction>>(json, _options) ?? new();
-
-            return new AppSettings
-            {
-                Macro = new MacroSettings { Actions = legacyActions }
-            };
-        }
-
         AppSettings settings = JsonSerializer.Deserialize<AppSettings>(json, _options)
             ?? throw new InvalidDataException("The settings file is empty or invalid.");
 
-        if (settings.SchemaVersion is not (1 or 2))
+        if (settings.SchemaVersion != 3)
             throw new InvalidDataException(
                 $"Unsupported settings schema version: {settings.SchemaVersion}.");
 
@@ -58,7 +46,6 @@ public class MacroJsonService : IMacroJsonService
         settings.Macro ??= new MacroSettings();
         settings.Macro.Actions ??= new List<MacroAction>();
         NormalizeActions(settings.Macro.Actions);
-        settings.SchemaVersion = 2;
 
         return settings;
     }
@@ -68,6 +55,14 @@ public class MacroJsonService : IMacroJsonService
         foreach (MacroAction action in actions)
         {
             action.Actions ??= new List<MacroAction>();
+
+            if (action.Type == MacroActionType.Press &&
+                action.DurationMilliseconds is < 1 or > 60_000)
+            {
+                throw new InvalidDataException(
+                    $"PRESS '{action.Value}' must specify durationMilliseconds between 1 and 60000.");
+            }
+
             NormalizeActions(action.Actions);
         }
     }

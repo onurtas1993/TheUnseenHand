@@ -21,8 +21,20 @@ public partial class ActionEditorWindow : Window
 
     private void OkButton_Click(object sender, RoutedEventArgs e)
     {
-        Result = _viewModel.CreateAction();
-        DialogResult = true;
+        try
+        {
+            Result = _viewModel.CreateAction();
+            DialogResult = true;
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show(
+                this,
+                exception.Message,
+                "Invalid action",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+        }
     }
 
     private void DragArea_MouseLeftButtonDown(

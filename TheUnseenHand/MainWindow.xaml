@@ -8,6 +8,7 @@
         AllowsTransparency="True"
         Background="Transparent"
         ResizeMode="NoResize"
+        Closing="MainWindow_Closing"
         WindowStartupLocation="CenterScreen">
 
     <Grid Background="Transparent">

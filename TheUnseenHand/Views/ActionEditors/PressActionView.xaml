@@ -7,10 +7,18 @@
             <ColumnDefinition Width="12"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="12"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <TextBlock Text="Key:"
-                   VerticalAlignment="Center"/>
+        <TextBlock Text="Key:" VerticalAlignment="Center"/>
         <TextBox Grid.Column="2"
                  Text="{Binding Key, UpdateSourceTrigger=PropertyChanged}"/>
+
+        <TextBlock Grid.Row="2" Text="Hold for (ms):" VerticalAlignment="Center"/>
+        <TextBox Grid.Row="2" Grid.Column="2"
+                 Text="{Binding DurationMilliseconds, UpdateSourceTrigger=PropertyChanged}"/>
     </Grid>
 </UserControl>

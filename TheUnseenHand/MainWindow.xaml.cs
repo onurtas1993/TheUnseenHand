@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Input;
+using System.ComponentModel;
 using TheUnseenHand.ViewModels;
 using TheUnseenHand.Views;
 
@@ -29,6 +30,12 @@ public partial class MainWindow : Window
         RoutedEventArgs e)
     {
         Close();
+    }
+
+    private void MainWindow_Closing(object? sender, CancelEventArgs e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.Stop();
     }
 
     private void AddActionButton_Click(object sender, RoutedEventArgs e)
@@ -65,6 +72,7 @@ public partial class MainWindow : Window
         {
             selectedAction.Type = editor.Result.Type;
             selectedAction.Value = editor.Result.Value;
+            selectedAction.DurationMilliseconds = editor.Result.DurationMilliseconds;
             selectedAction.Condition = editor.Result.Condition;
             selectedAction.Actions = editor.Result.Actions;
         }

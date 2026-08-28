@@ -83,7 +83,7 @@ public class MainViewModel
         }
     }
 
-    private void Stop()
+    public void Stop()
     {
         _executionCancellation?.Cancel();
     }
