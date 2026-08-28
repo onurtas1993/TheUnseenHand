@@ -59,6 +59,15 @@ public class ActionEditorViewModel : INotifyPropertyChanged
             }
         }
 
+        if (CurrentEditor is IfActionViewModel
+            {
+                Source: ConditionSource.CurrentMob,
+                MobNames.Count: 0
+            })
+        {
+            throw new InvalidOperationException("Add at least one mob name.");
+        }
+
         string value = CurrentEditor switch
         {
             PressActionViewModel pressAction => pressAction.Key,
@@ -78,7 +87,12 @@ public class ActionEditorViewModel : INotifyPropertyChanged
                 {
                     Source = conditional.Source,
                     Operator = conditional.Operator,
-                    Value = conditional.ComparisonValue.Trim()
+                    Value = conditional.Source == ConditionSource.CurrentMob
+                        ? string.Empty
+                        : conditional.ComparisonValue.Trim(),
+                    Values = conditional.Source == ConditionSource.CurrentMob
+                        ? conditional.MobNames.ToList()
+                        : new List<string>()
                 }
                 : null,
             Actions = CurrentEditor is IfActionViewModel ifEditor
@@ -123,6 +137,9 @@ public class ActionEditorViewModel : INotifyPropertyChanged
 
         if (action is not null)
         {
+            foreach (string mobName in action.Condition?.Values ?? new List<string>())
+                editor.MobNames.Add(mobName);
+
             foreach (MacroAction child in action.Actions)
                 editor.Actions.Add(child);
 

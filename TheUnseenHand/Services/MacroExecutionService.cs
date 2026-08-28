@@ -134,8 +134,11 @@ public class MacroExecutionService : IMacroExecutionService
                 string recognizedName =
                     await _vision.Value.ReadMobNameAsync(cancellationToken);
 
+                if (string.IsNullOrWhiteSpace(recognizedName))
+                    return true;
+
                 return await ExecuteSequenceAsync(
-                    CompareText(recognizedName, condition.Operator, condition.Value)
+                    CompareTextList(recognizedName, condition.Operator, condition.Values)
                         ? action.Actions
                         : action.ElseActions,
                     processName,
@@ -178,6 +181,13 @@ public class MacroExecutionService : IMacroExecutionService
         {
             throw;
         }
+        catch (InvalidDataException)
+        {
+            // A single image can be blurred, partially updated, or misread.
+            // Skip this IF without selecting THEN or ELSE; the next macro loop
+            // will capture and evaluate a fresh image.
+            return true;
+        }
     }
 
     private static double GetNumericValue(GameVitals state, ConditionSource source) => source switch
@@ -205,20 +215,21 @@ public class MacroExecutionService : IMacroExecutionService
         _ => false
     };
 
-    private static bool CompareText(
+    private static bool CompareTextList(
         string actual,
         ComparisonOperator comparison,
-        string expected)
+        IEnumerable<string> expectedValues)
     {
-        bool equals = string.Equals(
-            NormalizeText(actual),
+        string normalizedActual = NormalizeText(actual);
+        bool contains = expectedValues.Any(expected => string.Equals(
+            normalizedActual,
             NormalizeText(expected),
-            StringComparison.OrdinalIgnoreCase);
+            StringComparison.OrdinalIgnoreCase));
 
         return comparison switch
         {
-            ComparisonOperator.Equals => equals,
-            ComparisonOperator.NotEquals => !equals,
+            ComparisonOperator.Equals => contains,
+            ComparisonOperator.NotEquals => !contains,
             _ => false
         };
     }

@@ -98,10 +98,16 @@ public class MacroAction : INotifyPropertyChanged
             MacroActionType.Press => $"PRESS {Value}",
             MacroActionType.Wait => $"WAIT {Value} MS",
             MacroActionType.If when Condition is not null =>
-                $"IF {FormatSource(Condition.Source)} {FormatOperator(Condition.Operator)} {Condition.Value} " +
+                $"IF {FormatSource(Condition.Source)} {FormatOperator(Condition.Operator)} " +
+                $"{FormatConditionValue(Condition)} " +
                 $"THEN ({Actions.Count}) ELSE ({ElseActions.Count})",
             _ => $"{Type} {Value}"
         };
+
+    private static string FormatConditionValue(MacroCondition condition) =>
+        condition.Source == ConditionSource.CurrentMob
+            ? $"[{string.Join(", ", condition.Values)}]"
+            : condition.Value;
 
     private static string FormatDuration(int milliseconds) =>
         milliseconds % 1000 == 0

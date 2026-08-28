@@ -10,6 +10,8 @@ public sealed class IfActionViewModel : INotifyPropertyChanged
     private ConditionSource _source = ConditionSource.PlayerHP;
     private ComparisonOperator _operator = ComparisonOperator.LessThan;
     private string _comparisonValue = string.Empty;
+    private string _newMobName = string.Empty;
+    private string? _selectedMobName;
     private MacroAction? _selectedAction;
     private MacroAction? _selectedElseAction;
 
@@ -31,6 +33,7 @@ public sealed class IfActionViewModel : INotifyPropertyChanged
             _source = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(Operators));
+            OnPropertyChanged(nameof(IsMobCondition));
 
             if (!Operators.Contains(Operator))
                 Operator = ComparisonOperator.Equals;
@@ -56,6 +59,30 @@ public sealed class IfActionViewModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
+
+    public bool IsMobCondition => Source == ConditionSource.CurrentMob;
+
+    public string NewMobName
+    {
+        get => _newMobName;
+        set
+        {
+            _newMobName = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string? SelectedMobName
+    {
+        get => _selectedMobName;
+        set
+        {
+            _selectedMobName = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public ObservableCollection<string> MobNames { get; } = new();
 
     public ObservableCollection<MacroAction> Actions { get; } = new();
     public ObservableCollection<MacroAction> ElseActions { get; } = new();
