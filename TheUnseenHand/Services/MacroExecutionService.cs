@@ -10,6 +10,7 @@ public class MacroExecutionService : IMacroExecutionService
 {
     private static readonly TimeSpan FocusPollInterval = TimeSpan.FromMilliseconds(50);
     private readonly Lazy<GameVisionReader> _vision;
+    private readonly Dictionary<MacroAction, DateTimeOffset> _lastIfChecks = new();
 
     public event EventHandler<GameStateReadEventArgs>? GameStateRead;
 
@@ -24,6 +25,7 @@ public class MacroExecutionService : IMacroExecutionService
         IEnumerable<MacroAction> actions,
         CancellationToken cancellationToken = default)
     {
+        _lastIfChecks.Clear();
         await ExecuteSequenceAsync(actions, null, new VisionReadCache(), cancellationToken);
     }
 
@@ -35,6 +37,8 @@ public class MacroExecutionService : IMacroExecutionService
         MacroAction[] actionList = actions.ToArray();
         if (actionList.Length == 0)
             throw new InvalidOperationException("Add at least one action before starting.");
+
+        _lastIfChecks.Clear();
 
         if (ContainsVisionCondition(actionList))
             await _vision.Value.EnsureAvailableAsync(cancellationToken);
@@ -132,6 +136,21 @@ public class MacroExecutionService : IMacroExecutionService
 
         if (action.Actions.Count == 0 && action.ElseActions.Count == 0)
             return true;
+
+        if (action.CheckIntervalMilliseconds < 0)
+            throw new InvalidOperationException("IF check interval cannot be negative.");
+
+        if (action.CheckIntervalMilliseconds > 0)
+        {
+            DateTimeOffset now = DateTimeOffset.UtcNow;
+            if (_lastIfChecks.TryGetValue(action, out DateTimeOffset lastCheck) &&
+                now - lastCheck < TimeSpan.FromMilliseconds(action.CheckIntervalMilliseconds))
+            {
+                return true;
+            }
+
+            _lastIfChecks[action] = now;
+        }
 
         try
         {

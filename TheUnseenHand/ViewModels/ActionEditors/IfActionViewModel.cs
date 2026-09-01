@@ -9,6 +9,7 @@ public sealed class IfActionViewModel : INotifyPropertyChanged
     private string _source = string.Empty;
     private ComparisonOperator _operator = ComparisonOperator.LessThan;
     private string _comparisonValue = string.Empty;
+    private int _checkIntervalMilliseconds;
     private MacroAction? _selectedAction;
     private MacroAction? _selectedElseAction;
 
@@ -43,6 +44,16 @@ public sealed class IfActionViewModel : INotifyPropertyChanged
         set
         {
             _comparisonValue = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int CheckIntervalMilliseconds
+    {
+        get => _checkIntervalMilliseconds;
+        set
+        {
+            _checkIntervalMilliseconds = value;
             OnPropertyChanged();
         }
     }

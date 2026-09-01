@@ -63,6 +63,12 @@ public class ActionEditorViewModel : INotifyPropertyChanged
             string.IsNullOrWhiteSpace(conditionEditor.Source))
             throw new InvalidOperationException("Enter a GameVision output name.");
 
+        if (CurrentEditor is IfActionViewModel intervalEditor &&
+            intervalEditor.CheckIntervalMilliseconds < 0)
+        {
+            throw new InvalidOperationException("Check interval cannot be negative.");
+        }
+
         string value = CurrentEditor switch
         {
             PressActionViewModel pressAction => pressAction.Key,
@@ -76,6 +82,9 @@ public class ActionEditorViewModel : INotifyPropertyChanged
             Value = value,
             DurationMilliseconds = CurrentEditor is PressActionViewModel durationEditor
                 ? durationEditor.DurationMilliseconds
+                : 0,
+            CheckIntervalMilliseconds = CurrentEditor is IfActionViewModel checkIntervalEditor
+                ? checkIntervalEditor.CheckIntervalMilliseconds
                 : 0,
             Condition = CurrentEditor is IfActionViewModel conditional
                 ? new MacroCondition
@@ -122,7 +131,8 @@ public class ActionEditorViewModel : INotifyPropertyChanged
         {
             Source = action?.Condition?.Source ?? string.Empty,
             Operator = action?.Condition?.Operator ?? ComparisonOperator.LessThan,
-            ComparisonValue = action?.Condition?.Value ?? string.Empty
+            ComparisonValue = action?.Condition?.Value ?? string.Empty,
+            CheckIntervalMilliseconds = action?.CheckIntervalMilliseconds ?? 0
         };
 
         if (action is not null)

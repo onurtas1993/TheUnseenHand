@@ -9,6 +9,7 @@ public class MacroAction : INotifyPropertyChanged
     private MacroActionType _type;
     private string _value = string.Empty;
     private int _durationMilliseconds;
+    private int _checkIntervalMilliseconds;
     private MacroCondition? _condition;
     private List<MacroAction> _actions = new();
     private List<MacroAction> _elseActions = new();
@@ -51,6 +52,21 @@ public class MacroAction : INotifyPropertyChanged
                 return;
 
             _durationMilliseconds = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(DisplayText));
+        }
+    }
+
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int CheckIntervalMilliseconds
+    {
+        get => _checkIntervalMilliseconds;
+        set
+        {
+            if (_checkIntervalMilliseconds == value)
+                return;
+
+            _checkIntervalMilliseconds = value;
             OnPropertyChanged();
             OnPropertyChanged(nameof(DisplayText));
         }
@@ -100,7 +116,10 @@ public class MacroAction : INotifyPropertyChanged
             MacroActionType.If when Condition is not null =>
                 $"IF {Condition.Source} {FormatOperator(Condition.Operator)} " +
                 $"{Condition.Value} " +
-                $"THEN ({Actions.Count}) ELSE ({ElseActions.Count})",
+                $"THEN ({Actions.Count}) ELSE ({ElseActions.Count})" +
+                (CheckIntervalMilliseconds > 0
+                    ? $" EVERY {FormatDuration(CheckIntervalMilliseconds)}"
+                    : string.Empty),
             _ => $"{Type} {Value}"
         };
 

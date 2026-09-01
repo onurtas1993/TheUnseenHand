@@ -64,6 +64,12 @@ public class MacroJsonService : IMacroJsonService
                     $"PRESS '{action.Value}' must specify durationMilliseconds between 1 and 60000.");
             }
 
+            if (action.Type == MacroActionType.If && action.CheckIntervalMilliseconds < 0)
+            {
+                throw new InvalidDataException(
+                    "IF checkIntervalMilliseconds cannot be negative.");
+            }
+
             NormalizeActions(action.Actions);
             NormalizeActions(action.ElseActions);
         }
