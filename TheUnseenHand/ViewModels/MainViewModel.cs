@@ -2,6 +2,7 @@
 using Microsoft.Win32;
 using System.IO;
 using System.ComponentModel;
+using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 using TheUnseenHand.Infrastructure;
 using TheUnseenHand.Models;
@@ -17,14 +18,14 @@ public class MainViewModel : INotifyPropertyChanged
 
     private readonly IMacroExecutionService _macroExecutionService;
     private readonly IMacroJsonService _macroJsonService;
+    private readonly HashSet<MacroAction> _subscribedActions = new();
     private CancellationTokenSource? _executionCancellation;
     private string _targetProcessName = "notepad.exe";
     private bool _isLoadingSettings = true;
-    private string _latestVitals = "Last GameVision value: --";
-    private string _latestNumericCondition = "Last IF: --";
     private MacroAction? _selectedAction;
 
     public ObservableCollection<MacroAction> Actions { get; } = new();
+    public ObservableCollection<GameVisionValueItem> GameVisionValues { get; } = new();
 
     public MacroAction? SelectedAction
     {
@@ -35,26 +36,6 @@ public class MainViewModel : INotifyPropertyChanged
                 return;
 
             _selectedAction = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public string LatestVitals
-    {
-        get => _latestVitals;
-        private set
-        {
-            _latestVitals = value;
-            OnPropertyChanged();
-        }
-    }
-
-    public string LatestNumericCondition
-    {
-        get => _latestNumericCondition;
-        private set
-        {
-            _latestNumericCondition = value;
             OnPropertyChanged();
         }
     }
@@ -72,6 +53,7 @@ public class MainViewModel : INotifyPropertyChanged
         _macroExecutionService = macroExecutionService ?? new MacroExecutionService();
         _macroExecutionService.GameStateRead += MacroExecutionService_GameStateRead;
         _macroJsonService = macroJsonService ?? new MacroJsonService();
+        Actions.CollectionChanged += Actions_CollectionChanged;
         RemoveCommand = new RelayCommand(Remove);
         StartCommand = new RelayCommand(
             _ => _ = StartAsync(),
@@ -91,15 +73,75 @@ public class MainViewModel : INotifyPropertyChanged
     {
         void Apply()
         {
-            LatestVitals = $"Last GameVision value: {e.Source} = {e.ActualValue}";
-            LatestNumericCondition =
-                $"Last IF: {e.Comparison} = {e.Result.ToString().ToUpperInvariant()}";
+            GameVisionValueItem? item = GameVisionValues.FirstOrDefault(
+                value => string.Equals(value.Source, e.Source, StringComparison.OrdinalIgnoreCase));
+            if (item is not null)
+                item.Value = e.ActualValue;
         }
 
         if (System.Windows.Application.Current.Dispatcher.CheckAccess())
             Apply();
         else
             System.Windows.Application.Current.Dispatcher.Invoke(Apply);
+    }
+
+    private void Actions_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        foreach (MacroAction action in _subscribedActions)
+            action.PropertyChanged -= Action_PropertyChanged;
+
+        _subscribedActions.Clear();
+        foreach (MacroAction action in Actions)
+        {
+            action.PropertyChanged += Action_PropertyChanged;
+            _subscribedActions.Add(action);
+        }
+
+        RefreshGameVisionValues();
+    }
+
+    private void Action_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        RefreshGameVisionValues();
+    }
+
+    public void RefreshGameVisionValues()
+    {
+        var previousValues = GameVisionValues.ToDictionary(
+            item => item.Source,
+            item => item.Value,
+            StringComparer.OrdinalIgnoreCase);
+        var sources = new List<string>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        CollectConditionSources(Actions, sources, seen);
+
+        GameVisionValues.Clear();
+        foreach (string source in sources)
+        {
+            GameVisionValues.Add(new GameVisionValueItem(
+                source,
+                previousValues.GetValueOrDefault(source, "--")));
+        }
+    }
+
+    private static void CollectConditionSources(
+        IEnumerable<MacroAction> actions,
+        ICollection<string> sources,
+        ISet<string> seen)
+    {
+        foreach (MacroAction action in actions)
+        {
+            if (action.Type == MacroActionType.If &&
+                !string.IsNullOrWhiteSpace(action.Condition?.Source) &&
+                seen.Add(action.Condition.Source))
+            {
+                sources.Add(action.Condition.Source);
+            }
+
+            CollectConditionSources(action.Actions, sources, seen);
+            CollectConditionSources(action.ElseActions, sources, seen);
+        }
     }
 
     private async Task StartAsync()
@@ -263,4 +305,32 @@ public class MainViewModel : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+}
+
+public sealed class GameVisionValueItem : INotifyPropertyChanged
+{
+    private string _value;
+
+    public GameVisionValueItem(string source, string value)
+    {
+        Source = source;
+        _value = value;
+    }
+
+    public string Source { get; }
+
+    public string Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value)
+                return;
+
+            _value = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }

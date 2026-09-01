@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="The Unseen Hand"
         Width="430"
-        Height="582"
+        Height="644"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -28,7 +28,7 @@
             <!-- Title -->
             <TextBlock Text="The Unseen Hand"
                        Canvas.Left="140"
-                       Canvas.Top="18"
+                       Canvas.Top="20"
                        FontSize="18"
                        FontWeight="SemiBold"
                        Foreground="White"
@@ -40,10 +40,10 @@
 
             <TextBlock Text="Macro Settings"
                        Canvas.Left="50"
-                       Canvas.Top="75"
+                       Canvas.Top="80"
                        FontSize="18"
                        FontWeight="SemiBold"
-                       Foreground="White"/>
+                       Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top"/>
 
             <ListBox x:Name="MacroList"
                      ItemsSource="{Binding Actions}"
@@ -55,7 +55,7 @@
                      BorderThickness="1"
                      Foreground="White"
                      Canvas.Left="50"
-                     Canvas.Top="113" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                     Canvas.Top="113" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
             <Button Content="▲"
                     Click="MoveActionUpButton_Click"
@@ -207,24 +207,54 @@
             </Button>
 
 
-            <TextBlock Text="{Binding LatestVitals}"
-                       Canvas.Left="50"
-                       Canvas.Top="390"
-                       Width="330"
-                       FontSize="15"
-                       FontWeight="SemiBold"
-                       Foreground="White"
-                       TextAlignment="Center"/>
+            <StackPanel Canvas.Left="50" Canvas.Top="420" HorizontalAlignment="Center" Height="139" VerticalAlignment="Top">
 
-            <TextBlock Text="{Binding LatestNumericCondition}"
-                       Canvas.Left="51"
-                       Canvas.Top="415"
-                       Width="330"
-                       FontSize="13"
-                       Foreground="White"
-                       TextAlignment="Center"
-                       TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                <!-- Static column headers -->
+                <Grid Width="280" Margin="0,0,0,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
+                    <TextBlock Text="Source"
+                   FontWeight="Bold"
+                   Foreground="White"/>
+
+                    <TextBlock Grid.Column="1"
+                   Text="Value"
+                   FontWeight="Bold"
+                   Foreground="White"/>
+                </Grid>
+
+                <!-- Data -->
+                <ListBox ItemsSource="{Binding GameVisionValues}"
+             Background="Transparent"
+             BorderThickness="1"
+             Foreground="White"
+             Height="117"
+             Width="330"
+             HorizontalAlignment="Center">
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Width="280">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="{Binding Source}"/>
+
+                                <TextBlock Grid.Column="1"
+                               Text="{Binding Value}"
+                               FontWeight="SemiBold"/>
+                            </Grid>
+                        </DataTemplate>
+
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+            </StackPanel>
             <!-- ======================== -->
             <!-- LOAD / SAVE              -->
             <!-- ======================== -->
@@ -235,7 +265,7 @@
                     Width="90"
                     Height="35"
                     Canvas.Left="196"
-                    Canvas.Top="73">
+                    Canvas.Top="77" HorizontalAlignment="Center" VerticalAlignment="Top">
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
@@ -267,7 +297,7 @@
                     Width="90"
                     Height="35"
                     Canvas.Left="291"
-                    Canvas.Top="73">
+                    Canvas.Top="76" HorizontalAlignment="Center" VerticalAlignment="Top">
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
@@ -302,8 +332,8 @@
                     Foreground="White"
                     Width="140"
                     Height="35"
-                    Canvas.Left="106"
-                    Canvas.Top="467">
+                    Canvas.Left="126"
+                    Canvas.Top="356" HorizontalAlignment="Left" VerticalAlignment="Center">
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
@@ -334,8 +364,8 @@
                     Foreground="White"
                     Width="140"
                     Height="35"
-                    Canvas.Left="240"
-                    Canvas.Top="467">
+                    Canvas.Left="251"
+                    Canvas.Top="356" HorizontalAlignment="Left" VerticalAlignment="Center">
 
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
