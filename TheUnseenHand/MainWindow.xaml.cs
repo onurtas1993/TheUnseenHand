@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Input;
 using System.ComponentModel;
+using TheUnseenHand.Models;
 using TheUnseenHand.ViewModels;
 using TheUnseenHand.Views;
 
@@ -77,6 +78,8 @@ public partial class MainWindow : Window
             selectedAction.Condition = editor.Result.Condition;
             selectedAction.Actions = editor.Result.Actions;
             selectedAction.ElseActions = editor.Result.ElseActions;
+            viewModel.RefreshGameVisionValues();
+            viewModel.RefreshMacroTree();
         }
     }
 
@@ -85,9 +88,15 @@ public partial class MainWindow : Window
         if (DataContext is not MainViewModel { SelectedAction: not null } viewModel)
             return;
 
-        int index = viewModel.Actions.IndexOf(viewModel.SelectedAction);
+        if (viewModel.SelectedTreeNode?.ContainingActions is not { } actions)
+            return;
+
+        int index = actions.IndexOf(viewModel.SelectedAction);
         if (index > 0)
-            viewModel.Actions.Move(index, index - 1);
+        {
+            MoveAction(actions, index, index - 1);
+            viewModel.RefreshMacroTree();
+        }
     }
 
     private void MoveActionDownButton_Click(object sender, RoutedEventArgs e)
@@ -95,8 +104,32 @@ public partial class MainWindow : Window
         if (DataContext is not MainViewModel { SelectedAction: not null } viewModel)
             return;
 
-        int index = viewModel.Actions.IndexOf(viewModel.SelectedAction);
-        if (index >= 0 && index < viewModel.Actions.Count - 1)
-            viewModel.Actions.Move(index, index + 1);
+        if (viewModel.SelectedTreeNode?.ContainingActions is not { } actions)
+            return;
+
+        int index = actions.IndexOf(viewModel.SelectedAction);
+        if (index >= 0 && index < actions.Count - 1)
+        {
+            MoveAction(actions, index, index + 1);
+            viewModel.RefreshMacroTree();
+        }
+    }
+
+    private void MacroTree_SelectedItemChanged(
+        object sender,
+        RoutedPropertyChangedEventArgs<object> e)
+    {
+        if (DataContext is MainViewModel viewModel)
+            viewModel.SelectedTreeNode = e.NewValue as MacroTreeNode;
+    }
+
+    private static void MoveAction(
+        IList<MacroAction> actions,
+        int oldIndex,
+        int newIndex)
+    {
+        MacroAction action = actions[oldIndex];
+        actions.RemoveAt(oldIndex);
+        actions.Insert(newIndex, action);
     }
 }

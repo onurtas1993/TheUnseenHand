@@ -1,6 +1,7 @@
 ﻿<Window x:Class="TheUnseenHand.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewModels="clr-namespace:TheUnseenHand.ViewModels"
         Title="The Unseen Hand"
         Width="430"
         Height="644"
@@ -45,17 +46,30 @@
                        FontWeight="SemiBold"
                        Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top"/>
 
-            <ListBox x:Name="MacroList"
-                     ItemsSource="{Binding Actions}"
-                     SelectedItem="{Binding SelectedAction}"
-                     DisplayMemberPath="DisplayText"
-                     Width="330"
-                     Height="203"
-                     Background="Transparent"
-                     BorderThickness="1"
-                     Foreground="White"
-                     Canvas.Left="50"
-                     Canvas.Top="113" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+            <TreeView x:Name="MacroTreeControl"
+                      ItemsSource="{Binding MacroTree}"
+                      SelectedItemChanged="MacroTree_SelectedItemChanged"
+                      Width="330"
+                      Height="203"
+                      Background="Transparent"
+                      BorderThickness="1"
+                      Foreground="White"
+                      Canvas.Left="50"
+                      Canvas.Top="113">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type viewModels:MacroTreeNode}"
+                                              ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding DisplayText}"
+                                   Foreground="White"/>
+                    </HierarchicalDataTemplate>
+                </TreeView.Resources>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="IsExpanded" Value="True"/>
+                        <Setter Property="Foreground" Value="White"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+            </TreeView>
 
             <Button Content="▲"
                     Click="MoveActionUpButton_Click"
@@ -175,7 +189,6 @@
 
             <Button Content="Remove"
                     Command="{Binding RemoveCommand}"
-                    CommandParameter="{Binding SelectedAction}"
                     Foreground="White"
                     Width="80"
                     Height="30"

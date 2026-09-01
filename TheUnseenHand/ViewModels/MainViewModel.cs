@@ -23,8 +23,10 @@ public class MainViewModel : INotifyPropertyChanged
     private string _targetProcessName = "notepad.exe";
     private bool _isLoadingSettings = true;
     private MacroAction? _selectedAction;
+    private MacroTreeNode? _selectedTreeNode;
 
     public ObservableCollection<MacroAction> Actions { get; } = new();
+    public ObservableCollection<MacroTreeNode> MacroTree { get; } = new();
     public ObservableCollection<GameVisionValueItem> GameVisionValues { get; } = new();
 
     public MacroAction? SelectedAction
@@ -36,6 +38,20 @@ public class MainViewModel : INotifyPropertyChanged
                 return;
 
             _selectedAction = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public MacroTreeNode? SelectedTreeNode
+    {
+        get => _selectedTreeNode;
+        set
+        {
+            if (ReferenceEquals(_selectedTreeNode, value))
+                return;
+
+            _selectedTreeNode = value;
+            SelectedAction = value?.Action;
             OnPropertyChanged();
         }
     }
@@ -98,6 +114,7 @@ public class MainViewModel : INotifyPropertyChanged
         }
 
         RefreshGameVisionValues();
+        RefreshMacroTree();
     }
 
     private void Action_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -123,6 +140,58 @@ public class MainViewModel : INotifyPropertyChanged
                 source,
                 previousValues.GetValueOrDefault(source, "--")));
         }
+    }
+
+    public void RefreshMacroTree()
+    {
+        MacroAction? selectedAction = SelectedTreeNode?.Action;
+        MacroTree.Clear();
+
+        foreach (MacroAction action in Actions)
+            MacroTree.Add(CreateActionNode(action, Actions));
+
+        SelectedTreeNode = FindActionNode(MacroTree, selectedAction);
+    }
+
+    private static MacroTreeNode CreateActionNode(
+        MacroAction action,
+        IList<MacroAction> containingActions)
+    {
+        var node = new MacroTreeNode(action.DisplayText, action, containingActions);
+        if (action.Type != MacroActionType.If)
+            return node;
+
+        var thenNode = new MacroTreeNode("THEN");
+        foreach (MacroAction child in action.Actions)
+            thenNode.Children.Add(CreateActionNode(child, action.Actions));
+
+        var elseNode = new MacroTreeNode("ELSE");
+        foreach (MacroAction child in action.ElseActions)
+            elseNode.Children.Add(CreateActionNode(child, action.ElseActions));
+
+        node.Children.Add(thenNode);
+        node.Children.Add(elseNode);
+        return node;
+    }
+
+    private static MacroTreeNode? FindActionNode(
+        IEnumerable<MacroTreeNode> nodes,
+        MacroAction? action)
+    {
+        if (action is null)
+            return null;
+
+        foreach (MacroTreeNode node in nodes)
+        {
+            if (ReferenceEquals(node.Action, action))
+                return node;
+
+            MacroTreeNode? match = FindActionNode(node.Children, action);
+            if (match is not null)
+                return match;
+        }
+
+        return null;
     }
 
     private static void CollectConditionSources(
@@ -293,10 +362,14 @@ public class MainViewModel : INotifyPropertyChanged
 
     private void Remove(object? parameter)
     {
-        if (parameter is MacroAction action)
-        {
-            Actions.Remove(action);
-        }
+        MacroTreeNode? node = SelectedTreeNode;
+        if (node?.Action is null || node.ContainingActions is null)
+            return;
+
+        node.ContainingActions.Remove(node.Action);
+        SelectedTreeNode = null;
+        RefreshGameVisionValues();
+        RefreshMacroTree();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -305,6 +378,24 @@ public class MainViewModel : INotifyPropertyChanged
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
+}
+
+public sealed class MacroTreeNode
+{
+    public MacroTreeNode(
+        string displayText,
+        MacroAction? action = null,
+        IList<MacroAction>? containingActions = null)
+    {
+        DisplayText = displayText;
+        Action = action;
+        ContainingActions = containingActions;
+    }
+
+    public string DisplayText { get; }
+    public MacroAction? Action { get; }
+    public IList<MacroAction>? ContainingActions { get; }
+    public ObservableCollection<MacroTreeNode> Children { get; } = new();
 }
 
 public sealed class GameVisionValueItem : INotifyPropertyChanged
