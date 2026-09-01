@@ -24,7 +24,7 @@ public class MacroExecutionService : IMacroExecutionService
         IEnumerable<MacroAction> actions,
         CancellationToken cancellationToken = default)
     {
-        await ExecuteSequenceAsync(actions, null, cancellationToken);
+        await ExecuteSequenceAsync(actions, null, new VisionReadCache(), cancellationToken);
     }
 
     public async Task ExecuteWhileForegroundAsync(
@@ -44,10 +44,11 @@ public class MacroExecutionService : IMacroExecutionService
 
         while (true)
         {
+            var visionCache = new VisionReadCache();
             foreach (MacroAction action in actionList)
             {
                 await WaitForForegroundAsync(processName, cancellationToken);
-                await ExecuteActionAsync(action, processName, cancellationToken);
+                await ExecuteActionAsync(action, processName, visionCache, cancellationToken);
             }
         }
     }
@@ -55,6 +56,7 @@ public class MacroExecutionService : IMacroExecutionService
     private async Task<bool> ExecuteSequenceAsync(
         IEnumerable<MacroAction> actions,
         string? processName,
+        VisionReadCache visionCache,
         CancellationToken cancellationToken)
     {
         foreach (MacroAction action in actions)
@@ -62,6 +64,7 @@ public class MacroExecutionService : IMacroExecutionService
             if (!await ExecuteActionAsync(
                     action,
                     processName,
+                    visionCache,
                     cancellationToken))
             {
                 return false;
@@ -74,6 +77,7 @@ public class MacroExecutionService : IMacroExecutionService
     private async Task<bool> ExecuteActionAsync(
         MacroAction action,
         string? processName,
+        VisionReadCache visionCache,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -109,6 +113,7 @@ public class MacroExecutionService : IMacroExecutionService
                 return await ExecuteIfAsync(
                     action,
                     processName,
+                    visionCache,
                     cancellationToken);
 
             default:
@@ -119,6 +124,7 @@ public class MacroExecutionService : IMacroExecutionService
     private async Task<bool> ExecuteIfAsync(
         MacroAction action,
         string? processName,
+        VisionReadCache visionCache,
         CancellationToken cancellationToken)
     {
         MacroCondition condition = action.Condition
@@ -129,44 +135,17 @@ public class MacroExecutionService : IMacroExecutionService
 
         try
         {
-            if (condition.Source == ConditionSource.CurrentMob)
-            {
-                string recognizedName =
-                    await _vision.Value.ReadMobNameAsync(cancellationToken);
+            GameVisionValue? value = await ReadCachedValueAsync(
+                condition.Source, visionCache, cancellationToken);
+            if (value is null)
+                return true;
 
-                if (string.IsNullOrWhiteSpace(recognizedName))
-                    return true;
-
-                return await ExecuteSequenceAsync(
-                    CompareTextList(recognizedName, condition.Operator, condition.Values)
-                        ? action.Actions
-                        : action.ElseActions,
-                    processName,
-                    cancellationToken);
-            }
-
-            GameVitals state = await _vision.Value.ReadVitalsAsync(cancellationToken);
-            double actual = GetNumericValue(state, condition.Source);
-
-            if (!double.TryParse(
-                    condition.Value,
-                    NumberStyles.Float,
-                    CultureInfo.InvariantCulture,
-                    out double expected))
-            {
-                throw new InvalidOperationException(
-                    $"Invalid numeric IF value: '{condition.Value}'.");
-            }
-
-            bool conditionResult = CompareNumber(actual, condition.Operator, expected);
+            bool conditionResult = Compare(value, condition.Operator, condition.Value);
             GameStateRead?.Invoke(this, new GameStateReadEventArgs
             {
-                PlayerHP = state.PlayerHP,
-                PlayerMaxHP = state.PlayerMaxHP,
-                PlayerMP = state.PlayerMP,
-                PlayerMaxMP = state.PlayerMaxMP,
-                Comparison = $"{FormatSource(condition.Source)} {actual:0.##} " +
-                             $"{FormatOperator(condition.Operator)} {expected:0.##}",
+                Source = value.Name,
+                ActualValue = Convert.ToString(value.Value, CultureInfo.InvariantCulture) ?? string.Empty,
+                Comparison = $"{value.Name} {value.Value} {FormatOperator(condition.Operator)} {condition.Value}",
                 Result = conditionResult
             });
 
@@ -175,6 +154,7 @@ public class MacroExecutionService : IMacroExecutionService
                     ? action.Actions
                     : action.ElseActions,
                 processName,
+                visionCache,
                 cancellationToken);
         }
         catch (OperationCanceledException)
@@ -190,21 +170,50 @@ public class MacroExecutionService : IMacroExecutionService
         }
     }
 
-    private static double GetNumericValue(GameVitals state, ConditionSource source) => source switch
+    private async Task<GameVisionValue?> ReadCachedValueAsync(
+        string outputName,
+        VisionReadCache cache,
+        CancellationToken cancellationToken)
     {
-        ConditionSource.PlayerHP => state.PlayerHP,
-        ConditionSource.PlayerMaxHP => state.PlayerMaxHP,
-        ConditionSource.PlayerHPPercent => state.PlayerHPPercent,
-        ConditionSource.PlayerMP => state.PlayerMP,
-        ConditionSource.PlayerMaxMP => state.PlayerMaxMP,
-        ConditionSource.PlayerMPPercent => state.PlayerMPPercent,
-        _ => throw new InvalidOperationException($"'{source}' is not numeric.")
-    };
+        string readerName = _vision.Value.GetReaderNameForOutput(outputName);
+        if (!cache.Results.TryGetValue(readerName, out GameVisionResult? result))
+        {
+            result = await _vision.Value.ReadAsync(readerName, cancellationToken);
+            cache.Results.Add(readerName, result);
+        }
+
+        return result.Values.GetValueOrDefault(outputName);
+    }
+
+    private static bool Compare(GameVisionValue value, ComparisonOperator comparison, string expected)
+    {
+        if (value.Type == GameVisionValueType.Text)
+        {
+            if (comparison is not (ComparisonOperator.Equals or ComparisonOperator.NotEquals))
+                throw new InvalidOperationException($"Text output '{value.Name}' only supports Equals and NotEquals.");
+            bool equals = string.Equals(NormalizeText(value.GetText()), NormalizeText(expected),
+                StringComparison.OrdinalIgnoreCase);
+            return comparison == ComparisonOperator.Equals ? equals : !equals;
+        }
+
+        if (value.Type == GameVisionValueType.Boolean)
+        {
+            if (comparison is not (ComparisonOperator.Equals or ComparisonOperator.NotEquals) ||
+                !bool.TryParse(expected, out bool expectedBoolean))
+                throw new InvalidOperationException($"Boolean output '{value.Name}' requires Equals/NotEquals and true or false.");
+            bool equals = value.GetBoolean() == expectedBoolean;
+            return comparison == ComparisonOperator.Equals ? equals : !equals;
+        }
+
+        if (!decimal.TryParse(expected, NumberStyles.Float, CultureInfo.InvariantCulture, out decimal expectedNumber))
+            throw new InvalidOperationException($"Invalid numeric IF value: '{expected}'.");
+        return CompareNumber(value.GetDecimal(), comparison, expectedNumber);
+    }
 
     private static bool CompareNumber(
-        double actual,
+        decimal actual,
         ComparisonOperator comparison,
-        double expected) => comparison switch
+        decimal expected) => comparison switch
     {
         ComparisonOperator.Equals => actual == expected,
         ComparisonOperator.NotEquals => actual != expected,
@@ -215,25 +224,6 @@ public class MacroExecutionService : IMacroExecutionService
         _ => false
     };
 
-    private static bool CompareTextList(
-        string actual,
-        ComparisonOperator comparison,
-        IEnumerable<string> expectedValues)
-    {
-        string normalizedActual = NormalizeText(actual);
-        bool contains = expectedValues.Any(expected => string.Equals(
-            normalizedActual,
-            NormalizeText(expected),
-            StringComparison.OrdinalIgnoreCase));
-
-        return comparison switch
-        {
-            ComparisonOperator.Equals => contains,
-            ComparisonOperator.NotEquals => !contains,
-            _ => false
-        };
-    }
-
     private static string NormalizeText(string value)
     {
         return string.Join(
@@ -241,17 +231,6 @@ public class MacroExecutionService : IMacroExecutionService
             value.Trim().Trim('"', '\'', '`')
                 .Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
     }
-
-    private static string FormatSource(ConditionSource source) => source switch
-    {
-        ConditionSource.PlayerHP => "HP",
-        ConditionSource.PlayerMaxHP => "MAX HP",
-        ConditionSource.PlayerHPPercent => "HP %",
-        ConditionSource.PlayerMP => "MP",
-        ConditionSource.PlayerMaxMP => "MAX MP",
-        ConditionSource.PlayerMPPercent => "MP %",
-        _ => source.ToString()
-    };
 
     private static string FormatOperator(ComparisonOperator comparison) => comparison switch
     {
@@ -271,6 +250,12 @@ public class MacroExecutionService : IMacroExecutionService
             (action.Condition is not null ||
              ContainsVisionCondition(action.Actions) ||
              ContainsVisionCondition(action.ElseActions)));
+    }
+
+    private sealed class VisionReadCache
+    {
+        public Dictionary<string, GameVisionResult> Results { get; } =
+            new(StringComparer.OrdinalIgnoreCase);
     }
 
     private static async Task WaitForForegroundAsync(

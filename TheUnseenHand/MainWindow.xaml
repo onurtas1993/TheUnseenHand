@@ -209,7 +209,7 @@
 
             <TextBlock Text="{Binding LatestVitals}"
                        Canvas.Left="50"
-                       Canvas.Top="374"
+                       Canvas.Top="390"
                        Width="330"
                        FontSize="15"
                        FontWeight="SemiBold"
@@ -217,13 +217,13 @@
                        TextAlignment="Center"/>
 
             <TextBlock Text="{Binding LatestNumericCondition}"
-                       Canvas.Left="50"
-                       Canvas.Top="399"
+                       Canvas.Left="51"
+                       Canvas.Top="415"
                        Width="330"
                        FontSize="13"
                        Foreground="White"
                        TextAlignment="Center"
-                       TextWrapping="Wrap"/>
+                       TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Top"/>
 
             <!-- ======================== -->
             <!-- LOAD / SAVE              -->

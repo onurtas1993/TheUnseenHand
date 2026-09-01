@@ -1,17 +1,36 @@
 {
   "ExecutableName": "KnightOnLine.exe",
-  "VitalsRegion": {
-    "Anchor": "TopLeft",
-    "X": 80,
-    "Y": 37,
-    "Width": 90,
-    "Height": 27
-  },
-  "MobNameRegion": {
-    "Anchor": "TopCenter",
-    "X": -100,
-    "Y": 11,
-    "Width": 200,
-    "Height": 18
+  "Readers": {
+    "PlayerVitals": {
+      "Region": { "Anchor": "TopLeft", "X": 80, "Y": 37, "Width": 90, "Height": 27 },
+      "Prompt": [
+        "Read the four numeric player-vitals values visible in this image.",
+        "The top row is current HP / maximum HP and the bottom row is current MP / maximum MP.",
+        "Read the printed digits, not the bar length."
+      ],
+      "Outputs": {
+        "PlayerHP": { "Type": "Integer" },
+        "PlayerMaxHP": { "Type": "Integer" },
+        "PlayerMP": { "Type": "Integer" },
+        "PlayerMaxMP": { "Type": "Integer" }
+      }
+    },
+    "CurrentMob": {
+      "Region": { "Anchor": "TopCenter", "X": -100, "Y": 11, "Width": 200, "Height": 18 },
+      "Prompt": ["Read the exact mob name visible in this image.", "Preserve spaces."],
+      "Outputs": { "CurrentMob": { "Type": "Text" } }
+    },
+    "PlayerInfo": {
+      "Region": { "Anchor": "TopLeft", "X": 38, "Y": 336, "Width": 120, "Height": 40 },
+      "Prompt": [
+        "The top row is Attack; read the number directly beside the visible Attack label.",
+        "The bottom row is Defence; read the number directly beside the visible Defence label.",
+        "If a label or its adjacent number is not visible, mark that output unreadable."
+      ],
+      "Outputs": {
+        "Attack": { "Type": "Integer", "Minimum": 100, "Maximum": 9999 },
+        "Defence": { "Type": "Integer", "Minimum": 100, "Maximum": 9999 }
+      }
+    }
   }
 }

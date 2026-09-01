@@ -20,8 +20,8 @@ public class MainViewModel : INotifyPropertyChanged
     private CancellationTokenSource? _executionCancellation;
     private string _targetProcessName = "notepad.exe";
     private bool _isLoadingSettings = true;
-    private string _latestVitals = "HP: -- / --    MP: -- / --";
-    private string _latestNumericCondition = "Last numeric IF: --";
+    private string _latestVitals = "Last GameVision value: --";
+    private string _latestNumericCondition = "Last IF: --";
 
     public ObservableCollection<MacroAction> Actions { get; } = new();
 
@@ -79,11 +79,9 @@ public class MainViewModel : INotifyPropertyChanged
     {
         void Apply()
         {
-            LatestVitals =
-                $"HP: {e.PlayerHP} / {e.PlayerMaxHP}    " +
-                $"MP: {e.PlayerMP} / {e.PlayerMaxMP}";
+            LatestVitals = $"Last GameVision value: {e.Source} = {e.ActualValue}";
             LatestNumericCondition =
-                $"Last numeric IF: {e.Comparison} = {e.Result.ToString().ToUpperInvariant()}";
+                $"Last IF: {e.Comparison} = {e.Result.ToString().ToUpperInvariant()}";
         }
 
         if (System.Windows.Application.Current.Dispatcher.CheckAccess())

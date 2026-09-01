@@ -11,10 +11,6 @@
         </Grid.RowDefinitions>
 
         <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="8"/>
@@ -22,52 +18,12 @@
                 <ColumnDefinition Width="8"/>
                 <ColumnDefinition Width="1.35*"/>
             </Grid.ColumnDefinitions>
-            <ComboBox ItemsSource="{Binding Sources}" SelectedItem="{Binding Source}"/>
+            <TextBox Text="{Binding Source, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Output name from gamevision.json"/>
             <ComboBox Grid.Column="2" ItemsSource="{Binding Operators}"
                       SelectedItem="{Binding Operator}"/>
             <TextBox Grid.Column="4"
-                     Text="{Binding ComparisonValue, UpdateSourceTrigger=PropertyChanged}">
-                <TextBox.Style>
-                    <Style TargetType="TextBox">
-                        <Setter Property="Visibility" Value="Visible"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsMobCondition}" Value="True">
-                                <Setter Property="Visibility" Value="Collapsed"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </TextBox.Style>
-            </TextBox>
-
-            <Grid Grid.Row="1" Grid.ColumnSpan="5" Margin="0,8,0,0">
-                <Grid.Style>
-                    <Style TargetType="Grid">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsMobCondition}" Value="True">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Grid.Style>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="70"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="8"/>
-                    <ColumnDefinition Width="64"/>
-                </Grid.ColumnDefinitions>
-                <TextBox Text="{Binding NewMobName, UpdateSourceTrigger=PropertyChanged}"/>
-                <Button Grid.Column="2" Content="Add" Click="AddMobButton_Click"/>
-                <ListBox Grid.Row="1" Grid.ColumnSpan="2" Margin="0,5,0,0"
-                         ItemsSource="{Binding MobNames}"
-                         SelectedItem="{Binding SelectedMobName}"
-                         Background="#22000000" Foreground="White"/>
-                <Button Grid.Row="1" Grid.Column="2" Margin="0,5,0,0"
-                        Content="Remove" Click="RemoveMobButton_Click"/>
-            </Grid>
+                     Text="{Binding ComparisonValue, UpdateSourceTrigger=PropertyChanged}"/>
         </Grid>
 
         <GroupBox Grid.Row="2" Header="THEN" Foreground="White">

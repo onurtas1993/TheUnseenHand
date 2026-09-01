@@ -8,22 +8,22 @@ Windows vision boundary for capturing configured game regions and reading them w
 using var vision = new GameVisionReader("gamevision.json", "localai.json");
 
 await vision.EnsureAvailableAsync();
-var state = await vision.ReadVitalsAsync();
-var mobName = await vision.ReadMobNameAsync();
+var vitals = await vision.ReadAsync("PlayerVitals");
+var hp = vitals.Values["PlayerHP"].GetInteger();
 
-var hp = state.PlayerHP;
-var maxHp = state.PlayerMaxHP;
-var mp = state.PlayerMP;
-var maxMp = state.PlayerMaxMP;
+var mob = await vision.ReadValueAsync("CurrentMob");
+var allVisibleValues = await vision.ReadAllAsync();
 ```
 
-`ReadVitalsAsync()` and `ReadMobNameAsync()` verify that the focused window belongs to the configured executable, capture the relevant raw pixels, and send the PNG directly to LocalAIAdapter. GameVision owns both the screen-region configuration and the prompts/output parsing.
+`ReadAsync()` reads one configured region and publishes every successfully parsed output. `ReadValueAsync()` locates an output by its globally unique name. `ReadAllAsync()` reads every configured reader. Every operation verifies that the focused window belongs to the configured executable before capturing pixels and sending the PNG to LocalAIAdapter.
 
-`CaptureRegion()`, `CaptureVitalsRegion()`, and `CaptureMobRegion()` expose the untouched cropped pixels for diagnostics. They do not resize, threshold, sharpen, or otherwise preprocess the image.
+`CaptureReader()` and `CaptureRegion()` expose untouched cropped pixels for diagnostics. They do not resize, threshold, sharpen, or otherwise preprocess the image.
 
 ## Configuration
 
-`gamevision.json` contains absolute coordinates relative to the captured game client area. `localai.json` selects the Local AI endpoint and vision model. There is no automatic coordinate scaling.
+`gamevision.json` contains a `Readers` object. Each freely named reader defines a region, prompt lines, and one or more freely named outputs. Output names must be unique across the file. Supported output types are `Text`, `Integer`, `Decimal`, and `Boolean`. Numeric outputs may optionally define `Minimum` and `Maximum`; integer outputs may additionally define `MinimumDigits` and `MaximumDigits`. These constraints are validated after recognition and are not disclosed to the model. Coordinates are relative to the captured game client area and are not automatically scaled. `localai.json` selects the Local AI endpoint and vision model.
+
+The response schema is generated from `Outputs`. GameVision makes one model request per reader. The model must return a `readable` decision and a typed `value` for numeric outputs. A value is published only when it is readable, present, correctly typed, and passes its optional configured validators. Unreadable, contradictory, type-invalid, or out-of-range results are reported in `Failures` and omitted from `Values`.
 
 ## Recognition
 

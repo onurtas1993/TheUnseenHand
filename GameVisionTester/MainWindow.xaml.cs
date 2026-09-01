@@ -1,162 +1,101 @@
-﻿using GameVision;
+using GameVision;
 using System.Drawing;
 using System.IO;
+using System.Text.Json;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 
 namespace GameVisionTester;
 
 public partial class MainWindow : Window
 {
-    public MainWindow()
-    {
-        InitializeComponent();
-    }
+    public MainWindow() => InitializeComponent();
 
-    private async void CaptureButton_Click(
-       object sender,
-       RoutedEventArgs e)
+    private async void PreviewReaderButton_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            var selectedItem =
-                (ComboBoxItem)AnchorComboBox.SelectedItem;
-
-            var anchorName =
-                selectedItem.Content.ToString()!;
-
-            var anchor =
-                Enum.Parse<ScreenAnchor>(anchorName);
-
-            var region = new ScreenRegion
-            {
-                Anchor = anchor,
-                X = int.Parse(XTextBox.Text),
-                Y = int.Parse(YTextBox.Text),
-                Width = int.Parse(WidthTextBox.Text),
-                Height = int.Parse(HeightTextBox.Text)
-            };
-
-            ResultTextBox.Text =
-                "Switch to the game... capturing in 3 seconds.";
-
-            await Task.Delay(3000);
-
-            var reader = new GameVisionReader();
-
-            using var result = reader.CaptureRegion(
-                ExeTextBox.Text.Trim(),
-                region);
-
-            PreviewImage.Source =
-                BitmapToImageSource(result);
-
-            ResultTextBox.Text = "Raw region captured.";
+            string readerName = GetReaderName();
+            await PrepareCaptureAsync($"testing reader '{readerName}'");
+            using var vision = new GameVisionReader();
+            using Bitmap capture = vision.CaptureReader(readerName);
+            PreviewImage.Source = BitmapToImageSource(capture);
+            GameVisionResult result = await vision.ReadAsync(readerName);
+            ResultTextBox.Text = FormatResult(result.Values, result.Failures);
         }
-        catch (Exception ex)
+        catch (Exception exception) { ShowError(exception); }
+    }
+
+    private async void ReadAllButton_Click(object sender, RoutedEventArgs e)
+    {
+        try
         {
+            await PrepareCaptureAsync("reading all configured readers");
+            using var vision = new GameVisionReader();
+            GameVisionSnapshot snapshot = await vision.ReadAllAsync();
             PreviewImage.Source = null;
-            ResultTextBox.Text = ex.Message;
+            ResultTextBox.Text = FormatResult(snapshot.Values, snapshot.Failures);
         }
+        catch (Exception exception) { ShowError(exception); }
+    }
+
+    private string GetReaderName()
+    {
+        string readerName = ReaderNameTextBox.Text.Trim();
+        return readerName.Length > 0
+            ? readerName
+            : throw new InvalidOperationException(
+                "Enter a reader name exactly as configured in gamevision.json.");
+    }
+
+    private async Task PrepareCaptureAsync(string operation)
+    {
+        PreviewImage.Source = null;
+        ResultTextBox.Text = $"Switch to the game... {operation} in 3 seconds.";
+        await Task.Delay(3000);
+    }
+
+    private void ShowError(Exception exception)
+    {
+        PreviewImage.Source = null;
+        ResultTextBox.Text = $"{exception.GetType().Name}: {exception.Message}";
+    }
+
+    private static string FormatResult(
+        IReadOnlyDictionary<string, GameVisionValue> values,
+        IReadOnlyDictionary<string, string> failures)
+    {
+        var publishedValues = values.ToDictionary(
+            pair => pair.Key,
+            pair => new
+            {
+                type = pair.Value.Type.ToString(),
+                value = pair.Value.Value,
+                reader = pair.Value.ReaderName,
+                capturedAt = pair.Value.CapturedAt
+            },
+            StringComparer.OrdinalIgnoreCase);
+
+        return JsonSerializer.Serialize(
+            new
+            {
+                values = publishedValues,
+                failures
+            },
+            new JsonSerializerOptions { WriteIndented = true });
     }
 
     private static BitmapImage BitmapToImageSource(Bitmap bitmap)
     {
         using var stream = new MemoryStream();
-
-        bitmap.Save(
-            stream,
-            System.Drawing.Imaging.ImageFormat.Png);
-
+        bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
         stream.Position = 0;
-
         var image = new BitmapImage();
-
         image.BeginInit();
         image.CacheOption = BitmapCacheOption.OnLoad;
         image.StreamSource = stream;
         image.EndInit();
         image.Freeze();
-
         return image;
     }
-
-    private async void TestGameStateButton_Click(
-    object sender,
-    RoutedEventArgs e)
-    {
-        try
-        {
-            ResultTextBox.Text =
-                "Switch to the game... reading in 3 seconds.";
-
-            await Task.Delay(3000);
-
-            var reader = new GameVisionReader();
-
-            var state = await reader.ReadVitalsAsync();
-
-            ResultTextBox.Text =
-                $"HP: {state.PlayerHP}/{state.PlayerMaxHP}    " +
-                $"MP: {state.PlayerMP}/{state.PlayerMaxMP}";
-        }
-        catch (Exception ex)
-        {
-            ResultTextBox.Text = ex.Message;
-        }
-    }
-
-    private async void TestLocalAIButton_Click(
-        object sender,
-        RoutedEventArgs e)
-    {
-        try
-        {
-            var selectedItem =
-                (ComboBoxItem)AnchorComboBox.SelectedItem;
-
-            var anchor =
-                Enum.Parse<ScreenAnchor>(
-                    selectedItem.Content.ToString()!);
-
-            var region = new ScreenRegion
-            {
-                Anchor = anchor,
-                X = int.Parse(XTextBox.Text),
-                Y = int.Parse(YTextBox.Text),
-                Width = int.Parse(WidthTextBox.Text),
-                Height = int.Parse(HeightTextBox.Text)
-            };
-
-            ResultTextBox.Text =
-                "Switch to the game... capturing in 3 seconds.";
-
-            await Task.Delay(3000);
-
-            var vision =
-                new GameVisionReader();
-
-            using var capture =
-                vision.CaptureRegion(
-                    ExeTextBox.Text.Trim(),
-                    region);
-
-            PreviewImage.Source = BitmapToImageSource(capture);
-
-            string result = await vision.ReadMobNameAsync(
-                ExeTextBox.Text.Trim(),
-                region);
-
-            ResultTextBox.Text = result;
-        }
-        catch (Exception ex)
-        {
-            PreviewImage.Source = null;
-
-            ResultTextBox.Text =
-                $"{ex.GetType().Name}: {ex.Message}";
-        }
-    }
-
 }

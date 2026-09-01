@@ -98,33 +98,16 @@ public class MacroAction : INotifyPropertyChanged
             MacroActionType.Press => $"PRESS {Value}",
             MacroActionType.Wait => $"WAIT {Value} MS",
             MacroActionType.If when Condition is not null =>
-                $"IF {FormatSource(Condition.Source)} {FormatOperator(Condition.Operator)} " +
-                $"{FormatConditionValue(Condition)} " +
+                $"IF {Condition.Source} {FormatOperator(Condition.Operator)} " +
+                $"{Condition.Value} " +
                 $"THEN ({Actions.Count}) ELSE ({ElseActions.Count})",
             _ => $"{Type} {Value}"
         };
-
-    private static string FormatConditionValue(MacroCondition condition) =>
-        condition.Source == ConditionSource.CurrentMob
-            ? $"[{string.Join(", ", condition.Values)}]"
-            : condition.Value;
 
     private static string FormatDuration(int milliseconds) =>
         milliseconds % 1000 == 0
             ? $"{milliseconds / 1000} S"
             : $"{milliseconds} MS";
-
-    private static string FormatSource(ConditionSource source) => source switch
-    {
-        ConditionSource.PlayerHP => "HP",
-        ConditionSource.PlayerMaxHP => "MAX HP",
-        ConditionSource.PlayerHPPercent => "HP %",
-        ConditionSource.PlayerMP => "MP",
-        ConditionSource.PlayerMaxMP => "MAX MP",
-        ConditionSource.PlayerMPPercent => "MP %",
-        ConditionSource.CurrentMob => "MOB NAME",
-        _ => source.ToString().ToUpperInvariant()
-    };
 
     private static string FormatOperator(ComparisonOperator comparison) => comparison switch
     {

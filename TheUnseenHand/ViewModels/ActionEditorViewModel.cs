@@ -59,14 +59,9 @@ public class ActionEditorViewModel : INotifyPropertyChanged
             }
         }
 
-        if (CurrentEditor is IfActionViewModel
-            {
-                Source: ConditionSource.CurrentMob,
-                MobNames.Count: 0
-            })
-        {
-            throw new InvalidOperationException("Add at least one mob name.");
-        }
+        if (CurrentEditor is IfActionViewModel conditionEditor &&
+            string.IsNullOrWhiteSpace(conditionEditor.Source))
+            throw new InvalidOperationException("Enter a GameVision output name.");
 
         string value = CurrentEditor switch
         {
@@ -85,14 +80,9 @@ public class ActionEditorViewModel : INotifyPropertyChanged
             Condition = CurrentEditor is IfActionViewModel conditional
                 ? new MacroCondition
                 {
-                    Source = conditional.Source,
+                    Source = conditional.Source.Trim(),
                     Operator = conditional.Operator,
-                    Value = conditional.Source == ConditionSource.CurrentMob
-                        ? string.Empty
-                        : conditional.ComparisonValue.Trim(),
-                    Values = conditional.Source == ConditionSource.CurrentMob
-                        ? conditional.MobNames.ToList()
-                        : new List<string>()
+                    Value = conditional.ComparisonValue.Trim()
                 }
                 : null,
             Actions = CurrentEditor is IfActionViewModel ifEditor
@@ -130,16 +120,13 @@ public class ActionEditorViewModel : INotifyPropertyChanged
     {
         var editor = new IfActionViewModel
         {
-            Source = action?.Condition?.Source ?? ConditionSource.PlayerHP,
+            Source = action?.Condition?.Source ?? string.Empty,
             Operator = action?.Condition?.Operator ?? ComparisonOperator.LessThan,
             ComparisonValue = action?.Condition?.Value ?? string.Empty
         };
 
         if (action is not null)
         {
-            foreach (string mobName in action.Condition?.Values ?? new List<string>())
-                editor.MobNames.Add(mobName);
-
             foreach (MacroAction child in action.Actions)
                 editor.Actions.Add(child);
 

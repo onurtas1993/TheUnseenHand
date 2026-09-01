@@ -38,7 +38,7 @@ public class MacroJsonService : IMacroJsonService
         AppSettings settings = JsonSerializer.Deserialize<AppSettings>(json, _options)
             ?? throw new InvalidDataException("The settings file is empty or invalid.");
 
-        if (settings.SchemaVersion != 4)
+        if (settings.SchemaVersion != 5)
             throw new InvalidDataException(
                 $"Unsupported settings schema version: {settings.SchemaVersion}.");
 

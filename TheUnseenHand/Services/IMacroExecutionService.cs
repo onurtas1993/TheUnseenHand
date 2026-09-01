@@ -18,10 +18,8 @@ public interface IMacroExecutionService
 
 public sealed class GameStateReadEventArgs : EventArgs
 {
-    public required int PlayerHP { get; init; }
-    public required int PlayerMaxHP { get; init; }
-    public required int PlayerMP { get; init; }
-    public required int PlayerMaxMP { get; init; }
+    public required string Source { get; init; }
+    public required string ActualValue { get; init; }
     public required string Comparison { get; init; }
     public required bool Result { get; init; }
 }

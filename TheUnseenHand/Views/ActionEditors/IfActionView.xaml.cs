@@ -12,29 +12,6 @@ public partial class IfActionView : UserControl
         InitializeComponent();
     }
 
-    private void AddMobButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is not IfActionViewModel viewModel)
-            return;
-
-        string name = viewModel.NewMobName.Trim();
-        if (name.Length == 0 || viewModel.MobNames.Any(existing =>
-                string.Equals(existing, name, StringComparison.OrdinalIgnoreCase)))
-        {
-            return;
-        }
-
-        viewModel.MobNames.Add(name);
-        viewModel.SelectedMobName = name;
-        viewModel.NewMobName = string.Empty;
-    }
-
-    private void RemoveMobButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (DataContext is IfActionViewModel { SelectedMobName: not null } viewModel)
-            viewModel.MobNames.Remove(viewModel.SelectedMobName);
-    }
-
     private void AddButton_Click(object sender, RoutedEventArgs e)
     {
         if (DataContext is not IfActionViewModel viewModel)
