@@ -21,11 +21,16 @@ public class MacroExecutionService : IMacroExecutionService
             Path.Combine(AppContext.BaseDirectory, "localai.json")));
     }
 
+    public void ResetIntervalHistory()
+    {
+        _lastIfChecks.Clear();
+    }
+
     public async Task ExecuteAsync(
         IEnumerable<MacroAction> actions,
         CancellationToken cancellationToken = default)
     {
-        _lastIfChecks.Clear();
+        ResetIntervalHistory();
         await ExecuteSequenceAsync(actions, null, new VisionReadCache(), cancellationToken);
     }
 
@@ -38,7 +43,7 @@ public class MacroExecutionService : IMacroExecutionService
         if (actionList.Length == 0)
             throw new InvalidOperationException("Add at least one action before starting.");
 
-        _lastIfChecks.Clear();
+        ResetIntervalHistory();
 
         if (ContainsVisionCondition(actionList))
             await _vision.Value.EnsureAvailableAsync(cancellationToken);

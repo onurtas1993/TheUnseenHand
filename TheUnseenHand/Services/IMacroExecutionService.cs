@@ -6,6 +6,8 @@ public interface IMacroExecutionService
 {
     event EventHandler<GameStateReadEventArgs>? GameStateRead;
 
+    void ResetIntervalHistory();
+
     Task ExecuteAsync(
         IEnumerable<MacroAction> actions,
         CancellationToken cancellationToken = default);

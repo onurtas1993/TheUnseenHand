@@ -22,10 +22,22 @@ public class MainViewModel : INotifyPropertyChanged
     private bool _isLoadingSettings = true;
     private string _latestVitals = "Last GameVision value: --";
     private string _latestNumericCondition = "Last IF: --";
+    private MacroAction? _selectedAction;
 
     public ObservableCollection<MacroAction> Actions { get; } = new();
 
-    public MacroAction? SelectedAction { get; set; }
+    public MacroAction? SelectedAction
+    {
+        get => _selectedAction;
+        set
+        {
+            if (ReferenceEquals(_selectedAction, value))
+                return;
+
+            _selectedAction = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string LatestVitals
     {
@@ -128,6 +140,7 @@ public class MainViewModel : INotifyPropertyChanged
     public void Stop()
     {
         _executionCancellation?.Cancel();
+        _macroExecutionService.ResetIntervalHistory();
     }
 
     private void RefreshExecutionCommands()
