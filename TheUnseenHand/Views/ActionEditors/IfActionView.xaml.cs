@@ -17,7 +17,7 @@ public partial class IfActionView : UserControl
         if (DataContext is not IfActionViewModel viewModel)
             return;
 
-        var editor = new ActionEditorWindow(allowIf: false)
+        var editor = new ActionEditorWindow()
         {
             Owner = Window.GetWindow(this)
         };
@@ -35,7 +35,7 @@ public partial class IfActionView : UserControl
         }
 
         MacroAction selected = viewModel.SelectedAction;
-        var editor = new ActionEditorWindow(selected, allowIf: false)
+        var editor = new ActionEditorWindow(selected)
         {
             Owner = Window.GetWindow(this)
         };
@@ -78,7 +78,7 @@ public partial class IfActionView : UserControl
         if (DataContext is not IfActionViewModel viewModel)
             return;
 
-        var editor = new ActionEditorWindow(allowIf: false)
+        var editor = new ActionEditorWindow()
         {
             Owner = Window.GetWindow(this)
         };
@@ -93,7 +93,7 @@ public partial class IfActionView : UserControl
             return;
 
         MacroAction selected = viewModel.SelectedElseAction;
-        var editor = new ActionEditorWindow(selected, allowIf: false)
+        var editor = new ActionEditorWindow(selected)
         {
             Owner = Window.GetWindow(this)
         };
