@@ -73,6 +73,7 @@ public partial class MainWindow : Window
             selectedAction.Type = editor.Result.Type;
             selectedAction.Value = editor.Result.Value;
             selectedAction.DurationMilliseconds = editor.Result.DurationMilliseconds;
+            selectedAction.CheckIntervalMilliseconds = editor.Result.CheckIntervalMilliseconds;
             selectedAction.Condition = editor.Result.Condition;
             selectedAction.Actions = editor.Result.Actions;
             selectedAction.ElseActions = editor.Result.ElseActions;
