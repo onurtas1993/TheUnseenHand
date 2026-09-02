@@ -69,19 +69,7 @@ Each macro runs as a continuous gameplay loop. Before an action is executed, the
 
 ## Getting started
 
-Clone the repository and build the solution:
-
-```powershell
-git clone https://github.com/onurtas1993/TheUnseenHand.git
-cd TheUnseenHand
-dotnet build TheUnseenHand.sln -c Release -p:Platform=x64
-```
-
-Start the application from the repository:
-
-```powershell
-dotnet run --project .\TheUnseenHand\TheUnseenHand.csproj -c Release -p:Platform=x64
-```
+Clone the repository and build the solution by opening it in Visual Studio 2022.
 
 On startup, the app loads its default macro profile. Build and maintain profiles with the application's **Add Action**, **Edit Action**, **Load**, and **Save** controls.
 
@@ -132,13 +120,15 @@ The macro editor saves the target game and its nested action tree in `macro-sett
 
 Supported comparison operators are `Equals`, `NotEquals`, `LessThan`, `LessThanOrEqual`, `GreaterThan`, and `GreaterThanOrEqual`. Text and boolean outputs support equality comparisons; numeric outputs support all operators.
 
-### Saved GameVision format
+### Example saved GameVision format
 
-The coordinate GUI calculates capture regions for the parts of the game HUD the vision model needs to read. Those selections are stored in [`GameVision/gamevision.json`](GameVision/gamevision.json). The current example targets `KnightOnLine.exe` and contains readers for player vitals, the current mob name, and player combat stats.
+The `GameVision Tester` application calculates capture regions for the parts of the game HUD the vision model needs to read. Those selections are stored in [`GameVision/gamevision.json`](GameVision/gamevision.json). The current example targets one of the popular MMORPG game. Coodinates are being calculated via the user by guessing. See below GUI screenshot for testing an important area called 'GameVitals' from the targeted game. First the user writes the coordinates into .json file and via this GUI, makes the adjustments to grab that area perfectly.
+
+<img src="https://raw.githubusercontent.com/onurtas1993/images/refs/heads/main/gamevision_ss.png" width="567"/>
 
 ```json
 {
-  "ExecutableName": "KnightOnLine.exe",
+  "ExecutableName": "<GAME_EXECUTABLE>.exe",
   "Readers": {
     "PlayerVitals": {
       "Region": { "Anchor": "TopLeft", "X": 80, "Y": 37, "Width": 90, "Height": 27 },
@@ -213,7 +203,6 @@ Select the model exposed by your local server during setup. No model files, GPU 
 | `LocalAIAdapter` | Image and prompt requests to an OpenAI-compatible local endpoint |
 | `GameVisionTester` | Standalone preview and recognition diagnostics for configured regions |
 
-More implementation details are available in the [`GameVision`](GameVision/README.md) and [`LocalAIAdapter`](LocalAIAdapter/README.md) documentation.
 
 ## Safety and responsible use
 
@@ -229,4 +218,4 @@ dotnet build TheUnseenHand.sln -c Release -p:Platform=x64
 
 ## License
 
-Distributed under the [MIT License](LICENSE).
+Distributed under the [GPL-3.0 license](LICENSE).
