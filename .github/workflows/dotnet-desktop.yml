@@ -1,0 +1,52 @@
+name: Build The Unseen Hand
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build Windows x64
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install .NET 8 SDK
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+          architecture: x64
+
+      - name: Restore dependencies
+        run: dotnet restore TheUnseenHand.sln -p:Platform=x64
+
+      - name: Build solution
+        run: >
+          dotnet build TheUnseenHand.sln
+          --configuration Release
+          --no-restore
+          -p:Platform=x64
+
+      - name: Publish application
+        run: >
+          dotnet publish .\TheUnseenHand\TheUnseenHand.csproj
+          --configuration Release
+          --no-restore
+          -p:Platform=x64
+          --output .\artifacts\TheUnseenHand
+
+      - name: Upload application
+        uses: actions/upload-artifact@v7
+        with:
+          name: TheUnseenHand-windows-x64
+          path: artifacts/TheUnseenHand/
+          if-no-files-found: error
+          retention-days: 14
