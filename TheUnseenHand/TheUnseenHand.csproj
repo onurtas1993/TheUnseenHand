@@ -17,7 +17,7 @@
     <None Remove="Assets\close_clicked.png" />
     <None Remove="Assets\close_unclicked.png" />
     <None Remove="Assets\login_background.png" />
-    <None Remove="Assets\PremiumBack.jpg" />
+    <None Remove="Assets\PremiumBack.png" />
     <None Remove="Assets\unclicked_button.png" />
   </ItemGroup>
 
@@ -59,10 +59,7 @@
     <Resource Include="Assets\close_unclicked.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Assets\login_background.png">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Assets\PremiumBack.jpg">
+    <Resource Include="Assets\PremiumBack.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\unclicked_button.png">

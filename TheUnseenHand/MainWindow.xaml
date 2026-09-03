@@ -1,7 +1,7 @@
 ﻿<Window x:Class="TheUnseenHand.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:viewModels="clr-namespace:TheUnseenHand.ViewModels"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:viewModels="clr-namespace:TheUnseenHand.ViewModels"
         Title="The Unseen Hand"
         Width="430"
         Height="644"
@@ -12,50 +12,43 @@
         ResizeMode="NoResize"
         Closing="MainWindow_Closing"
         WindowStartupLocation="CenterScreen">
-
     <Grid Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="34*"/>
             <RowDefinition Height="63*"/>
         </Grid.RowDefinitions>
-
         <!-- Main background -->
         <Image Source="/Assets/background.png"
                Stretch="Fill"
                IsHitTestVisible="False" Grid.RowSpan="2"/>
-
         <Canvas Grid.RowSpan="2">
-
             <!-- Title -->
             <TextBlock Text="The Unseen Hand"
                        Canvas.Left="140"
-                       Canvas.Top="20"
+                       Canvas.Top="75"
                        FontSize="18"
                        FontWeight="SemiBold"
                        Foreground="White"
                        IsHitTestVisible="False"/>
-
             <!-- ======================== -->
             <!-- MACRO SETTINGS           -->
             <!-- ======================== -->
-
             <TextBlock Text="Macro Settings"
-                       Canvas.Left="50"
-                       Canvas.Top="80"
+                       Canvas.Left="49"
+                       Canvas.Top="122"
                        FontSize="18"
                        FontWeight="SemiBold"
                        Foreground="White" HorizontalAlignment="Center" VerticalAlignment="Top"/>
-
             <TreeView x:Name="MacroTreeControl"
                       ItemsSource="{Binding MacroTree}"
                       SelectedItemChanged="MacroTree_SelectedItemChanged"
-                      Width="330"
-                      Height="203"
+                      Width="341"
+                      Height="195"
                       Background="Transparent"
                       BorderThickness="1"
                       Foreground="White"
-                      Canvas.Left="50"
-                      Canvas.Top="113">
+                      Canvas.Left="44" 
+                      Canvas.Top="153" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type viewModels:MacroTreeNode}"
                                               ItemsSource="{Binding Children}">
@@ -69,228 +62,203 @@
                         <Setter Property="Foreground" Value="White"/>
                     </Style>
                 </TreeView.ItemContainerStyle>
+
+
             </TreeView>
-
-            <Button Content="▲"
-                    Click="MoveActionUpButton_Click"
-                    Foreground="White"
-                    FontSize="13"
-                    Width="30"
-                    Height="30"
-                    Canvas.Left="310"
-                    Canvas.Top="321" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Image x:Name="img" Source="/Assets/unclicked_button.png" Stretch="Fill"/>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="img" Property="Source" Value="/Assets/clicked_button.png"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
-
-            <Button Content="▼"
-                    Click="MoveActionDownButton_Click"
-                    Foreground="White"
-                    FontSize="13"
-                    Width="30"
-                    Height="30"
-                    Canvas.Left="350"
-                    Canvas.Top="321">
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Image x:Name="img" Source="/Assets/unclicked_button.png" Stretch="Fill"/>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="img" Property="Source" Value="/Assets/clicked_button.png"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
-
             <!-- ======================== -->
             <!-- ACTION BUTTONS           -->
             <!-- ======================== -->
 
-            <Button Content="Add Action"
-                    Click="AddActionButton_Click"
+            <Grid Background="Transparent"
+                      Canvas.Top="348"
+                      HorizontalAlignment="Left"
+                      Width="380" Canvas.Left="50" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="Add Action"
+                            Grid.Column="0"
+                    Click="AddActionButton_Click" 
+                        Margin="3"
                     Foreground="White"
                     Width="80"
                     Height="30"
                     Canvas.Left="50"
-                    Canvas.Top="321" HorizontalAlignment="Center" VerticalAlignment="Top">
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Image x:Name="img" 
+                    Canvas.Top="350" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Image x:Name="img" 
                                    Stretch="Fill"
                                    Source="/Assets/unclicked_button.png"/>
-
-                            <ContentPresenter
+                                <ContentPresenter
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"/>
-                        </Grid>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="img"
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="img"
                                         Property="Source"
                                         Value="/Assets/clicked_button.png"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
 
-            </Button>
-
-
-            <Button Content="Edit Action"
+                <Button Content="Edit Action"
+                            Grid.Column="1"
                     Click="EditActionButton_Click"
                     Foreground="White"
+                        Margin="3"
                     Width="80"
                     Height="30"
                     Canvas.Left="135"
-                    Canvas.Top="321" HorizontalAlignment="Left" VerticalAlignment="Top">
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Image x:Name="img"
+                    Canvas.Top="350" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Image x:Name="img"
                                    Stretch="Fill"
                                    Source="/Assets/unclicked_button.png"/>
-
-                            <ContentPresenter
+                                <ContentPresenter
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"/>
-                        </Grid>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="img"
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="img"
                                         Property="Source"
                                         Value="/Assets/clicked_button.png"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-
-            </Button>
-
-
-            <Button Content="Remove"
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Button Content="Remove"
+                            Grid.Column="2"
+                        Margin="3"
                     Command="{Binding RemoveCommand}"
                     Foreground="White"
                     Width="80"
                     Height="30"
                     Canvas.Left="220"
-                    Canvas.Top="321" HorizontalAlignment="Left" VerticalAlignment="Top">
-
-                <Button.Template>
-                    <ControlTemplate TargetType="Button">
-                        <Grid>
-                            <Image x:Name="img"
+                    Canvas.Top="350" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Image x:Name="img"
                                    Stretch="Fill"
                                    Source="/Assets/unclicked_button.png"/>
-
-                            <ContentPresenter
+                                <ContentPresenter
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"/>
-                        </Grid>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="img"
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="img"
                                         Property="Source"
                                         Value="/Assets/clicked_button.png"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Button.Template>
-
-            </Button>
-
-
-            <StackPanel Canvas.Left="50" Canvas.Top="420" HorizontalAlignment="Center" Height="139" VerticalAlignment="Top">
-
-                <!-- Static column headers -->
-                <Grid Width="280" Margin="0,0,0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Text="Source"
-                   FontWeight="Bold"
-                   Foreground="White"/>
-
-                    <TextBlock Grid.Column="1"
-                   Text="Value"
-                   FontWeight="Bold"
-                   Foreground="White"/>
-                </Grid>
-
-                <!-- Data -->
-                <ListBox ItemsSource="{Binding GameVisionValues}"
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Button Content="▲"
+    Click="MoveActionUpButton_Click"
+                            Grid.Column="3"
+                        Margin="3"
+    Foreground="White"
+    FontSize="13"
+    Width="30"
+    Height="30"
+    Canvas.Left="310"
+    Canvas.Top="350" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Image x:Name="img" Source="/Assets/unclicked_button.png" Stretch="Fill"/>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="img" Property="Source" Value="/Assets/clicked_button.png"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+                <Button Content="▼"
+    Click="MoveActionDownButton_Click"
+                            Grid.Column="4"
+                        Margin="3"
+    Foreground="White"
+    FontSize="13"
+    Width="30"
+    Height="30"
+    Canvas.Left="350"
+    Canvas.Top="350" HorizontalAlignment="Center" VerticalAlignment="Top">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Image x:Name="img" Source="/Assets/unclicked_button.png" Stretch="Fill"/>
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="img" Property="Source" Value="/Assets/clicked_button.png"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+            <!-- Data -->
+            <ListBox ItemsSource="{Binding GameVisionValues}"
              Background="Transparent"
              BorderThickness="1"
              Foreground="White"
              Height="117"
-             Width="330"
-             HorizontalAlignment="Center">
-
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Width="280">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Text="{Binding Source}"/>
-
-                                <TextBlock Grid.Column="1"
+             Width="342"
+             HorizontalAlignment="Center" Canvas.Left="44" Canvas.Top="409" VerticalAlignment="Top">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Width="280">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Source}"/>
+                            <TextBlock Grid.Column="1"
                                Text="{Binding Value}"
                                FontWeight="SemiBold"/>
-                            </Grid>
-                        </DataTemplate>
-
-                    </ListBox.ItemTemplate>
-                </ListBox>
-
-            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
             <!-- ======================== -->
             <!-- LOAD / SAVE              -->
             <!-- ======================== -->
-
             <Button Content="Load"
                     Command="{Binding LoadCommand}"
                     Foreground="White"
                     Width="90"
                     Height="35"
-                    Canvas.Left="196"
-                    Canvas.Top="77" HorizontalAlignment="Center" VerticalAlignment="Top">
-
+                    Canvas.Left="195"
+                    Canvas.Top="119" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Grid>
                             <Image x:Name="img"
                                    Source="/Assets/unclicked_button.png"/>
-
                             <ContentPresenter
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"/>
                         </Grid>
-
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="img"
@@ -300,29 +268,23 @@
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Button.Template>
-
             </Button>
-
-
             <Button Content="Save"
                     Command="{Binding SaveCommand}"
                     Foreground="White"
                     Width="90"
                     Height="35"
-                    Canvas.Left="291"
-                    Canvas.Top="76" HorizontalAlignment="Center" VerticalAlignment="Top">
-
+                    Canvas.Left="290"
+                    Canvas.Top="118" HorizontalAlignment="Center" VerticalAlignment="Top">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Grid>
                             <Image x:Name="img"
                                    Source="/Assets/unclicked_button.png"/>
-
                             <ContentPresenter
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"/>
                         </Grid>
-
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="img"
@@ -332,33 +294,26 @@
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Button.Template>
-
             </Button>
-
-
             <!-- ======================== -->
             <!-- START / STOP             -->
             <!-- ======================== -->
-
             <Button Content="Stop"
                     Command="{Binding StopCommand}"
                     Foreground="White"
                     Width="140"
                     Height="35"
-                    Canvas.Left="126"
-                    Canvas.Top="356" HorizontalAlignment="Left" VerticalAlignment="Center">
-
+                    Canvas.Left="75"
+                    Canvas.Top="528" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Grid>
                             <Image x:Name="img"
                                    Source="/Assets/unclicked_button.png"/>
-
                             <ContentPresenter
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"/>
                         </Grid>
-
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="img"
@@ -368,29 +323,23 @@
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Button.Template>
-
             </Button>
-
-
             <Button Content="Start"
                     Command="{Binding StartCommand}"
                     Foreground="White"
                     Width="140"
                     Height="35"
-                    Canvas.Left="251"
-                    Canvas.Top="356" HorizontalAlignment="Left" VerticalAlignment="Center">
-
+                    Canvas.Left="212"
+                    Canvas.Top="528" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <Button.Template>
                     <ControlTemplate TargetType="Button">
                         <Grid>
                             <Image x:Name="img"
                                    Source="/Assets/unclicked_button.png"/>
-
                             <ContentPresenter
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"/>
                         </Grid>
-
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="img"
@@ -400,35 +349,26 @@
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Button.Template>
-
             </Button>
-
         </Canvas>
-
-
         <!-- Full-width invisible drag area -->
-        <Border Height="70"
+        <Border Height="120"
                 VerticalAlignment="Top"
                 Background="Transparent"
                 MouseLeftButtonDown="DragArea_MouseLeftButtonDown"/>
-
-
         <!-- Close button -->
         <Button Width="26"
                 Height="26"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Top"
-                Margin="0,15,20,0"
+                Margin="0,69,29,0"
                 Click="CloseButton_Click">
-
             <Button.Template>
                 <ControlTemplate TargetType="Button">
-
                     <Grid>
                         <Image x:Name="img"
                                Source="/Assets/close_unclicked.png"/>
                     </Grid>
-
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsPressed" Value="True">
                             <Setter TargetName="img"
@@ -436,12 +376,8 @@
                                     Value="/Assets/close_clicked.png"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
-
                 </ControlTemplate>
             </Button.Template>
-
         </Button>
-
     </Grid>
-
 </Window>
