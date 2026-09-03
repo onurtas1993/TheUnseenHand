@@ -4,6 +4,7 @@ using System.IO;
 using System.ComponentModel;
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
+using Input.Abstractions;
 using TheUnseenHand.Infrastructure;
 using TheUnseenHand.Models;
 using TheUnseenHand.Services;
@@ -15,12 +16,15 @@ public class MainViewModel : INotifyPropertyChanged
     private static readonly string SettingsDirectory = AppContext.BaseDirectory;
     private static readonly string DefaultSettingsPath =
         Path.Combine(SettingsDirectory, "macro-settings.json");
+    private static readonly string InputSettingsPath =
+        Path.Combine(SettingsDirectory, "input.json");
 
     private readonly IMacroExecutionService _macroExecutionService;
     private readonly IMacroJsonService _macroJsonService;
     private readonly HashSet<MacroAction> _subscribedActions = new();
     private CancellationTokenSource? _executionCancellation;
     private string _targetProcessName = "notepad.exe";
+    private KeyboardProvider _keyboardProvider = KeyboardProvider.Windows;
     private bool _isLoadingSettings = true;
     private MacroAction? _selectedAction;
     private MacroTreeNode? _selectedTreeNode;
@@ -226,6 +230,7 @@ public class MainViewModel : INotifyPropertyChanged
             await _macroExecutionService.ExecuteWhileForegroundAsync(
                 Actions,
                 _targetProcessName,
+                _keyboardProvider,
                 _executionCancellation.Token);
         }
         catch (OperationCanceledException)
@@ -272,6 +277,7 @@ public class MainViewModel : INotifyPropertyChanged
 
             AppSettings settings = await _macroJsonService.LoadAsync(DefaultSettingsPath);
             ApplySettings(settings);
+            _keyboardProvider = InputSettings.Load(InputSettingsPath).KeyboardProvider;
         }
         catch (Exception exception)
         {
@@ -303,7 +309,10 @@ public class MainViewModel : INotifyPropertyChanged
         {
             var settings = new AppSettings
             {
-                Target = new TargetSettings { ProcessName = _targetProcessName },
+                Target = new TargetSettings
+                {
+                    ProcessName = _targetProcessName
+                },
                 Macro = new MacroSettings { Actions = Actions.ToList() }
             };
 

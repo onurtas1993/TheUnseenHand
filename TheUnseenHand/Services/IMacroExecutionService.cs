@@ -1,5 +1,7 @@
 ﻿using TheUnseenHand.Models;
 
+using Input.Abstractions;
+
 namespace TheUnseenHand.Services;
 
 public interface IMacroExecutionService
@@ -15,6 +17,7 @@ public interface IMacroExecutionService
     Task ExecuteWhileForegroundAsync(
         IEnumerable<MacroAction> actions,
         string processName,
+        KeyboardProvider keyboardProvider,
         CancellationToken cancellationToken = default);
 }
 

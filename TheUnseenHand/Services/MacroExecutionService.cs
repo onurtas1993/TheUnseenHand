@@ -2,6 +2,7 @@ using System.Globalization;
 using System.IO;
 using GameKeystrokes;
 using GameVision;
+using Input.Abstractions;
 using TheUnseenHand.Models;
 
 namespace TheUnseenHand.Services;
@@ -10,15 +11,23 @@ public class MacroExecutionService : IMacroExecutionService
 {
     private static readonly TimeSpan FocusPollInterval = TimeSpan.FromMilliseconds(50);
     private readonly Lazy<GameVisionReader> _vision;
+    private readonly IReadOnlyDictionary<KeyboardProvider, IKeyboardInput> _keyboardInputs;
     private readonly Dictionary<MacroAction, DateTimeOffset> _lastIfChecks = new();
 
     public event EventHandler<GameStateReadEventArgs>? GameStateRead;
 
-    public MacroExecutionService(GameVisionReader? vision = null)
+    public MacroExecutionService(
+        GameVisionReader? vision = null,
+        IReadOnlyDictionary<KeyboardProvider, IKeyboardInput>? keyboardInputs = null)
     {
         _vision = new Lazy<GameVisionReader>(() => vision ?? new GameVisionReader(
             Path.Combine(AppContext.BaseDirectory, "gamevision.json"),
             Path.Combine(AppContext.BaseDirectory, "localai.json")));
+        _keyboardInputs = keyboardInputs ?? new Dictionary<KeyboardProvider, IKeyboardInput>
+        {
+            [KeyboardProvider.Windows] = new WindowsKeyboardInput(),
+            [KeyboardProvider.Interception] = new GameKeystrokes3.InterceptionKeyboardInput()
+        };
     }
 
     public void ResetIntervalHistory()
@@ -37,6 +46,7 @@ public class MacroExecutionService : IMacroExecutionService
     public async Task ExecuteWhileForegroundAsync(
         IEnumerable<MacroAction> actions,
         string processName,
+        KeyboardProvider keyboardProvider,
         CancellationToken cancellationToken = default)
     {
         MacroAction[] actionList = actions.ToArray();
@@ -57,7 +67,7 @@ public class MacroExecutionService : IMacroExecutionService
             foreach (MacroAction action in actionList)
             {
                 await WaitForForegroundAsync(processName, cancellationToken);
-                await ExecuteActionAsync(action, processName, visionCache, cancellationToken);
+                await ExecuteActionAsync(action, processName, visionCache, cancellationToken, keyboardProvider);
             }
         }
     }
@@ -66,7 +76,8 @@ public class MacroExecutionService : IMacroExecutionService
         IEnumerable<MacroAction> actions,
         string? processName,
         VisionReadCache visionCache,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        KeyboardProvider keyboardProvider = KeyboardProvider.Windows)
     {
         foreach (MacroAction action in actions)
         {
@@ -74,7 +85,8 @@ public class MacroExecutionService : IMacroExecutionService
                     action,
                     processName,
                     visionCache,
-                    cancellationToken))
+                    cancellationToken,
+                    keyboardProvider))
             {
                 return false;
             }
@@ -87,7 +99,8 @@ public class MacroExecutionService : IMacroExecutionService
         MacroAction action,
         string? processName,
         VisionReadCache visionCache,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        KeyboardProvider keyboardProvider = KeyboardProvider.Windows)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
@@ -103,12 +116,19 @@ public class MacroExecutionService : IMacroExecutionService
                         "Key hold duration must be between 1 and 60000 ms.");
                 }
 
-                return await KeyboardInput.HoldAsync(
+                Func<bool>? shouldContinue = processName is null
+                    ? null
+                    : () => WindowTarget.IsProcessForeground(processName);
+                if (!_keyboardInputs.TryGetValue(keyboardProvider, out IKeyboardInput? keyboardInput))
+                {
+                    throw new InvalidOperationException(
+                        $"No keyboard input implementation is registered for '{keyboardProvider}'.");
+                }
+
+                return await keyboardInput.HoldAsync(
                     action.Value,
                     action.DurationMilliseconds,
-                    processName is null
-                        ? null
-                        : () => WindowTarget.IsProcessForeground(processName),
+                    shouldContinue,
                     cancellationToken);
 
             case MacroActionType.Wait:
@@ -123,7 +143,8 @@ public class MacroExecutionService : IMacroExecutionService
                     action,
                     processName,
                     visionCache,
-                    cancellationToken);
+                    cancellationToken,
+                    keyboardProvider);
 
             default:
                 throw new NotSupportedException($"Unsupported action type: {action.Type}");
@@ -134,7 +155,8 @@ public class MacroExecutionService : IMacroExecutionService
         MacroAction action,
         string? processName,
         VisionReadCache visionCache,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        KeyboardProvider keyboardProvider)
     {
         MacroCondition condition = action.Condition
             ?? throw new InvalidOperationException("The IF action has no condition.");
@@ -179,7 +201,8 @@ public class MacroExecutionService : IMacroExecutionService
                     : action.ElseActions,
                 processName,
                 visionCache,
-                cancellationToken);
+                cancellationToken,
+                keyboardProvider);
         }
         catch (OperationCanceledException)
         {

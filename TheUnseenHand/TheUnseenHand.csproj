@@ -27,7 +27,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GameKeystrokes\GameKeystrokes.csproj" />
+    <ProjectReference Include="..\GameKeystrokes3\GameKeystrokes3.csproj" />
     <ProjectReference Include="..\GameVision\GameVision.csproj" />
+    <ProjectReference Include="..\Input.Abstractions\Input.Abstractions.csproj" />
+    <Content Include="..\GameKeystrokes3\native\interception.dll" Link="interception.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\Input.Abstractions\input.json" Link="input.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
