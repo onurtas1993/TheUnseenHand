@@ -4,6 +4,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
+    <AssemblyName>Vision.Inference</AssemblyName>
+    <RootNamespace>Vision.Inference</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

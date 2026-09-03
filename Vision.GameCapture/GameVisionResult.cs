@@ -1,4 +1,4 @@
-namespace GameVision;
+namespace Vision.GameCapture;
 
 public sealed record GameVisionValue(string Name, GameVisionValueType Type, object Value,
     string ReaderName, DateTimeOffset CapturedAt)

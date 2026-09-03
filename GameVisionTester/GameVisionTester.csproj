@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GameVision\GameVision.csproj" />
+    <ProjectReference Include="..\Vision.GameCapture\Vision.GameCapture.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace LocalAIAdapter;
+namespace Vision.Inference;
 
 public sealed class LocalAIClient : IDisposable
 {

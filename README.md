@@ -44,7 +44,7 @@ Create rotations, recovery rules, target-dependent attacks, movement fallbacks, 
 - Screen-region capture relative to the game client area
 - Typed vision outputs: text, integer, decimal, and boolean
 - Optional validation constraints for recognized numeric values
-- Live display of values read by GameVision
+- Live display of values read by `Vision.GameCapture`
 - JSON import/export for reusable macro profiles
 - Local inference through an OpenAI-compatible LM Studio endpoint
 - Focus-aware execution that pauses when the target application loses focus
@@ -58,7 +58,7 @@ WPF macro editor
       |                                      |--> Input.Native (SendInput)
       |                                      +--> Input.Interception (driver)
       |
-      +-- If condition --> GameVision --> LocalAIAdapter --> LM Studio
+      +-- If condition --> Vision.GameCapture --> Vision.Inference --> LM Studio
                               |
                               +-- typed value --> THEN / ELSE branch
 ```
@@ -92,8 +92,8 @@ The project stores its configuration in four JSON files behind the scenes:
 | --- | --- |
 | [`TheUnseenHand/macro-settings.json`](TheUnseenHand/macro-settings.json) | Target process and ordered macro actions |
 | [`Input.Abstractions/input.json`](Input.Abstractions/input.json) | Keyboard input provider selection |
-| [`GameVision/gamevision.json`](GameVision/gamevision.json) | Capture regions, prompts, output types, and validation rules |
-| [`LocalAIAdapter/localai.json`](LocalAIAdapter/localai.json) | Local model endpoint, model name, timeout, and inference settings |
+| [`Vision.GameCapture/gamevision.json`](Vision.GameCapture/gamevision.json) | Capture regions, prompts, output types, and validation rules |
+| [`Vision.Inference/localai.json`](Vision.Inference/localai.json) | Local model endpoint, model name, timeout, and inference settings |
 
 ### Keyboard input provider
 
@@ -153,9 +153,9 @@ The macro editor saves only the target game and its nested action tree in `macro
 
 Supported comparison operators are `Equals`, `NotEquals`, `LessThan`, `LessThanOrEqual`, `GreaterThan`, and `GreaterThanOrEqual`. Text and boolean outputs support equality comparisons; numeric outputs support all operators.
 
-### Example saved GameVision format
+### Example saved Vision.GameCapture format
 
-The `GameVision Tester` application calculates capture regions for the parts of the game HUD the vision model needs to read. Those selections are stored in [`GameVision/gamevision.json`](GameVision/gamevision.json). The current example targets one of the popular MMORPG game. Coodinates are being calculated via the user by guessing. See below GUI screenshot for testing an important area called 'GameVitals' from the targeted game. First the user writes the coordinates into .json file and via this GUI, makes the adjustments to grab that area perfectly.
+The `GameVisionTester` application calculates capture regions for the parts of the game HUD the vision model needs to read. Those selections are stored in [`Vision.GameCapture/gamevision.json`](Vision.GameCapture/gamevision.json). The current example targets a popular MMORPG. Coordinates are initially supplied by the user, then adjusted in the tester until the intended area is captured precisely.
 
 <img src="https://raw.githubusercontent.com/onurtas1993/images/refs/heads/main/gamevision_ss.png" width="567"/>
 
@@ -234,8 +234,8 @@ Select the model exposed by your local server during setup. No model files, GPU 
 | `Input.Abstractions` | Shared `IKeyboardInput` contract and the independent `input.json` provider configuration |
 | `Input.Native` | Windows target-window discovery and `SendInput`-based keyboard input |
 | `Input.Interception` | Interception driver-backed scan-code input and driver installation assets |
-| `GameVision` | Foreground-window capture, region handling, and typed recognition |
-| `LocalAIAdapter` | Image and prompt requests to an OpenAI-compatible local endpoint |
+| `Vision.GameCapture` | Foreground-window capture, region handling, and typed recognition |
+| `Vision.Inference` | Image and prompt requests to an OpenAI-compatible local endpoint |
 | `GameVisionTester` | Standalone preview and recognition diagnostics for configured regions |
 
 

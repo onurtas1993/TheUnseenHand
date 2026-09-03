@@ -1,4 +1,4 @@
-﻿namespace GameVision;
+namespace Vision.GameCapture;
 
 public enum ScreenAnchor
 {

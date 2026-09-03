@@ -2,10 +2,10 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using GameVision.Internal;
-using LocalAIAdapter;
+using Vision.GameCapture.Internal;
+using Vision.Inference;
 
-namespace GameVision;
+namespace Vision.GameCapture;
 
 public sealed class GameVisionReader : IDisposable
 {

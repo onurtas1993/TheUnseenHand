@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.IO;
-using GameVision;
 using Input.Abstractions;
 using Input.Native;
 using TheUnseenHand.Models;
+using Vision.GameCapture;
 
 namespace TheUnseenHand.Services;
 

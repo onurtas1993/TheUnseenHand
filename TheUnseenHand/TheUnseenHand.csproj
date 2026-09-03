@@ -28,7 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Input.Native\Input.Native.csproj" />
     <ProjectReference Include="..\Input.Interception\Input.Interception.csproj" />
-    <ProjectReference Include="..\GameVision\GameVision.csproj" />
+    <ProjectReference Include="..\Vision.GameCapture\Vision.GameCapture.csproj" />
     <ProjectReference Include="..\Input.Abstractions\Input.Abstractions.csproj" />
     <Content Include="..\Input.Interception\native\interception.dll" Link="interception.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -6,11 +6,13 @@
     <Platforms>x64</Platforms>
     <PlatformTarget>x64</PlatformTarget>
     <UseSystemDrawing>true</UseSystemDrawing>
+    <AssemblyName>Vision.GameCapture</AssemblyName>
+    <RootNamespace>Vision.GameCapture</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.Drawing.Common" Version="10.0.11" />
-    <ProjectReference Include="..\LocalAIAdapter\LocalAIAdapter.csproj" />
+    <ProjectReference Include="..\Vision.Inference\Vision.Inference.csproj" />
   </ItemGroup>
 	
   <ItemGroup>

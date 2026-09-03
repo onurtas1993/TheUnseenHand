@@ -1,4 +1,4 @@
-# LocalAIAdapter
+# Vision.Inference
 
 Minimal .NET class library for forwarding image + prompt requests to a local LM Studio server using its OpenAI-compatible Chat Completions endpoint.
 
@@ -13,7 +13,7 @@ No LLamaSharp, GGUF loading, CUDA, Vulkan, or model files are handled by this li
 ## Usage
 
 ```csharp
-using LocalAIAdapter;
+using Vision.Inference;
 
 using var ai = new LocalAIClient("localai.json");
 

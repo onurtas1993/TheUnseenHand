@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace LocalAIAdapter;
+namespace Vision.Inference;
 
 public sealed class LocalAIConfig
 {
@@ -21,7 +21,7 @@ public sealed class LocalAIConfig
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         if (config is null)
-            throw new InvalidOperationException("Could not read LocalAIAdapter configuration.");
+            throw new InvalidOperationException("Could not read Vision.Inference configuration.");
 
         if (string.IsNullOrWhiteSpace(config.BaseUrl))
             throw new InvalidOperationException("BaseUrl is missing from localai.json.");

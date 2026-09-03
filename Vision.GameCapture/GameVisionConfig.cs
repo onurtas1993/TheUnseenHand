@@ -1,7 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace GameVision;
+namespace Vision.GameCapture;
 
 public sealed class GameVisionConfig
 {
@@ -14,7 +14,7 @@ public sealed class GameVisionConfig
         if (!File.Exists(path))
         {
             throw new FileNotFoundException(
-                $"GameVision configuration file was not found: {path}");
+                $"Vision.GameCapture configuration file was not found: {path}");
         }
 
         var json = File.ReadAllText(path);
@@ -36,7 +36,7 @@ public sealed class GameVisionConfig
         if (config is null)
         {
             throw new InvalidOperationException(
-                "Could not read GameVision configuration.");
+                "Could not read Vision.GameCapture configuration.");
         }
 
         config.Validate();
@@ -46,7 +46,7 @@ public sealed class GameVisionConfig
     private void Validate()
     {
         if (string.IsNullOrWhiteSpace(ExecutableName))
-            throw new InvalidOperationException("ExecutableName is missing from GameVision configuration.");
+            throw new InvalidOperationException("ExecutableName is missing from Vision.GameCapture configuration.");
         Readers = new Dictionary<string, GameVisionReaderConfig>(Readers, StringComparer.OrdinalIgnoreCase);
         if (Readers.Count == 0)
             throw new InvalidOperationException("At least one reader must be configured.");

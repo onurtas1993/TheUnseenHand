@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace GameVision.Internal;
+namespace Vision.GameCapture.Internal;
 
 internal static class ForegroundWindowCapture
 {
