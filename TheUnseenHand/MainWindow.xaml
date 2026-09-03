@@ -12,6 +12,118 @@
         ResizeMode="NoResize"
         Closing="MainWindow_Closing"
         WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style x:Key="CustomVerticalScrollBarStyle"
+               TargetType="{x:Type ScrollBar}">
+            <Setter Property="Width" Value="18" />
+            <Setter Property="MinWidth" Value="18" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid SnapsToDevicePixels="True">
+                            <Image Source="/Assets/scroll_background.png"
+                                   Stretch="Fill"
+                                   IsHitTestVisible="False" />
+                            <Track x:Name="PART_Track"
+                                   Margin="1,7"
+                                   Minimum="{TemplateBinding Minimum}"
+                                   Maximum="{TemplateBinding Maximum}"
+                                   Value="{TemplateBinding Value}"
+                                   ViewportSize="NaN"
+                                   IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageUpCommand}"
+                                                  Focusable="False"
+                                                  Opacity="0" />
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Width="16"
+                                           Height="42"
+                                           Margin="0">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="{x:Type Thumb}">
+                                                <Image Source="/Assets/scroll_holder.png"
+                                                       Stretch="Uniform"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       SnapsToDevicePixels="True" />
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="{x:Static ScrollBar.PageDownCommand}"
+                                                  Focusable="False"
+                                                  Opacity="0" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Width" Value="Auto" />
+                    <Setter Property="MinWidth" Value="0" />
+                    <Setter Property="Height" Value="18" />
+                    <Setter Property="MinHeight" Value="18" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ScrollBar}">
+                                <Grid SnapsToDevicePixels="True">
+                                    <Image Source="/Assets/scroll_background.png"
+                                           Stretch="Fill"
+                                           IsHitTestVisible="False">
+                                        <Image.LayoutTransform>
+                                            <RotateTransform Angle="90" />
+                                        </Image.LayoutTransform>
+                                    </Image>
+                                    <Track x:Name="PART_Track"
+                                           Margin="12,1"
+                                           Minimum="{TemplateBinding Minimum}"
+                                           Maximum="{TemplateBinding Maximum}"
+                                           Value="{TemplateBinding Value}"
+                                           ViewportSize="NaN"
+                                           IsDirectionReversed="False">
+                                        <Track.DecreaseRepeatButton>
+                                            <RepeatButton Command="{x:Static ScrollBar.PageLeftCommand}"
+                                                          Focusable="False"
+                                                          Opacity="0" />
+                                        </Track.DecreaseRepeatButton>
+                                        <Track.Thumb>
+                                            <Thumb Width="42"
+                                                   Height="16"
+                                                   Margin="0">
+                                                <Thumb.Template>
+                                                    <ControlTemplate TargetType="{x:Type Thumb}">
+                                                        <Image Source="/Assets/scroll_holder.png"
+                                                               Stretch="Uniform"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               SnapsToDevicePixels="True">
+                                                            <Image.LayoutTransform>
+                                                                <RotateTransform Angle="90" />
+                                                            </Image.LayoutTransform>
+                                                        </Image>
+                                                    </ControlTemplate>
+                                                </Thumb.Template>
+                                            </Thumb>
+                                        </Track.Thumb>
+                                        <Track.IncreaseRepeatButton>
+                                            <RepeatButton Command="{x:Static ScrollBar.PageRightCommand}"
+                                                          Focusable="False"
+                                                          Opacity="0" />
+                                        </Track.IncreaseRepeatButton>
+                                    </Track>
+                                </Grid>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
     <Grid Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="34*" />
@@ -94,9 +206,13 @@
                       Background="Transparent"
                       BorderThickness="1"
                       Foreground="White"
+                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                      ScrollViewer.VerticalScrollBarVisibility="Auto"
                       Canvas.Left="44"
                       Canvas.Top="153" HorizontalAlignment="Left" VerticalAlignment="Center">
                 <TreeView.Resources>
+                    <Style TargetType="{x:Type ScrollBar}"
+                           BasedOn="{StaticResource CustomVerticalScrollBarStyle}" />
                     <HierarchicalDataTemplate DataType="{x:Type viewModels:MacroTreeNode}"
                                               ItemsSource="{Binding Children}">
                         <TextBlock Text="{Binding DisplayText}"
@@ -266,7 +382,13 @@
                      Foreground="White"
                      Height="117"
                      Width="342"
+                     ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                      HorizontalAlignment="Center" Canvas.Left="44" Canvas.Top="409" VerticalAlignment="Top">
+                <ListBox.Resources>
+                    <Style TargetType="{x:Type ScrollBar}"
+                           BasedOn="{StaticResource CustomVerticalScrollBarStyle}" />
+                </ListBox.Resources>
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid Width="280">

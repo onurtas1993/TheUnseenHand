@@ -18,6 +18,8 @@
     <None Remove="Assets\close_unclicked.png" />
     <None Remove="Assets\login_background.png" />
     <None Remove="Assets\PremiumBack.png" />
+    <None Remove="Assets\scroll_background.png" />
+    <None Remove="Assets\scroll_holder.png" />
     <None Remove="Assets\unclicked_button.png" />
   </ItemGroup>
 
@@ -60,6 +62,12 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\PremiumBack.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\scroll_background.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Assets\scroll_holder.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Assets\unclicked_button.png">
