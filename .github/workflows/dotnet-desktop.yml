@@ -36,7 +36,7 @@ jobs:
           --no-restore
           -p:Platform=x64
 
-      - name: Publish application
+      - name: Publish The Unseen Hand
         run: >
           dotnet publish .\TheUnseenHand\TheUnseenHand.csproj
           --configuration Release
@@ -44,19 +44,38 @@ jobs:
           -p:Platform=x64
           --output .\artifacts\TheUnseenHand
 
-      - name: Create release ZIP
+      - name: Publish Vision Region Editor
+        run: >
+          dotnet publish .\Vision.RegionEditor\Vision.RegionEditor.csproj
+          --configuration Release
+          --no-restore
+          -p:Platform=x64
+          --output .\artifacts\Vision.RegionEditor
+
+      - name: Create release ZIPs
         if: startsWith(github.ref, 'refs/tags/v')
         shell: pwsh
-        run: >
-          Compress-Archive
-          -Path .\artifacts\TheUnseenHand\*
-          -DestinationPath .\artifacts\TheUnseenHand-windows-x64.zip
+        run: |
+          Compress-Archive `
+            -Path .\artifacts\TheUnseenHand\* `
+            -DestinationPath .\artifacts\TheUnseenHand-windows-x64.zip
+          Compress-Archive `
+            -Path .\artifacts\Vision.RegionEditor\* `
+            -DestinationPath .\artifacts\Vision.RegionEditor-windows-x64.zip
 
       - name: Upload Actions artifact
         uses: actions/upload-artifact@v7
         with:
           name: TheUnseenHand-windows-x64
           path: artifacts/TheUnseenHand/
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload Vision Region Editor artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: Vision.RegionEditor-windows-x64
+          path: artifacts/Vision.RegionEditor/
           if-no-files-found: error
           retention-days: 14
 
@@ -68,6 +87,7 @@ jobs:
         run: |
           gh release create $env:GITHUB_REF_NAME `
             .\artifacts\TheUnseenHand-windows-x64.zip `
+            .\artifacts\Vision.RegionEditor-windows-x64.zip `
             --verify-tag `
             --generate-notes `
             --title "The Unseen Hand $env:GITHUB_REF_NAME"
