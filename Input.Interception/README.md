@@ -1,13 +1,13 @@
-# GameKeystrokes3
+# Input.Interception
 
-`GameKeystrokes3` sends keyboard scan codes through the Interception v1.0.1
+`Input.Interception` sends keyboard scan codes through the Interception v1.0.1
 keyboard filter driver. It is intended for software that ignores user-mode
 `SendInput` input.
 
 ## Driver installation
 
 1. Open an Administrator Command Prompt.
-2. Change to the `GameKeystrokes3/tools` directory.
+2. Change to the `Input.Interception/tools` directory.
 3. Run `install-interception.exe /install`.
 4. Reboot Windows.
 

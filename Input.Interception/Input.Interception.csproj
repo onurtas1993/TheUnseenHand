@@ -6,6 +6,8 @@
     <Nullable>enable</Nullable>
     <Platforms>x64</Platforms>
     <PlatformTarget>x64</PlatformTarget>
+    <AssemblyName>Input.Interception</AssemblyName>
+    <RootNamespace>Input.Interception</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

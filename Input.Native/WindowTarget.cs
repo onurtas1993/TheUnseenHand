@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace GameKeystrokes;
+namespace Input.Native;
 
 /// <summary>
 /// Locates and focuses a top-level window belonging to a process.

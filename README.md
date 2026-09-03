@@ -49,7 +49,7 @@ Create rotations, recovery rules, target-dependent attacks, movement fallbacks, 
 ```text
 WPF macro editor
       |
-      +-- Press / Wait ----------------> GameKeystrokes --> target window
+      +-- Press / Wait --> Input.Abstractions --> Input.Native / Input.Interception --> target window
       |
       +-- If condition --> GameVision --> LocalAIAdapter --> LM Studio
                               |
@@ -199,7 +199,9 @@ Select the model exposed by your local server during setup. No model files, GPU 
 | Project | Responsibility |
 | --- | --- |
 | `TheUnseenHand` | Gamer-facing WPF macro creator, profiles, and gameplay-loop execution |
-| `GameKeystrokes` | Windows target-window discovery and keyboard input |
+| `Input.Abstractions` | Shared keyboard-input contract and provider configuration |
+| `Input.Native` | Windows target-window discovery and native `SendInput` keyboard input |
+| `Input.Interception` | Driver-backed Interception keyboard input |
 | `GameVision` | Foreground-window capture, region handling, and typed recognition |
 | `LocalAIAdapter` | Image and prompt requests to an OpenAI-compatible local endpoint |
 | `GameVisionTester` | Standalone preview and recognition diagnostics for configured regions |

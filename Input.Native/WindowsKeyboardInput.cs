@@ -1,8 +1,8 @@
 using Input.Abstractions;
 
-namespace GameKeystrokes3;
+namespace Input.Native;
 
-public sealed class InterceptionKeyboardInput : IKeyboardInput
+public sealed class WindowsKeyboardInput : IKeyboardInput
 {
     public Task TapAsync(string key, CancellationToken cancellationToken = default) =>
         KeyboardInput.TapAsync(key, cancellationToken);

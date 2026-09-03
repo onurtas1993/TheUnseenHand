@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 
-namespace GameKeystrokes3;
+namespace Input.Interception;
 
 /// <summary>
 /// Sends scan-code input through the Interception keyboard filter driver.

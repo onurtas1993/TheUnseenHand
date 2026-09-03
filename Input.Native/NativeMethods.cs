@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace GameKeystrokes;
+namespace Input.Native;
 
 internal static class NativeMethods
 {

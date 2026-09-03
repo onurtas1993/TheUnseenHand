@@ -1,8 +1,8 @@
 using System.Globalization;
 using System.IO;
-using GameKeystrokes;
 using GameVision;
 using Input.Abstractions;
+using Input.Native;
 using TheUnseenHand.Models;
 
 namespace TheUnseenHand.Services;
@@ -26,7 +26,7 @@ public class MacroExecutionService : IMacroExecutionService
         _keyboardInputs = keyboardInputs ?? new Dictionary<KeyboardProvider, IKeyboardInput>
         {
             [KeyboardProvider.Windows] = new WindowsKeyboardInput(),
-            [KeyboardProvider.Interception] = new GameKeystrokes3.InterceptionKeyboardInput()
+            [KeyboardProvider.Interception] = new Input.Interception.InterceptionKeyboardInput()
         };
     }
 

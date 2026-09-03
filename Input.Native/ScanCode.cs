@@ -1,4 +1,4 @@
-namespace GameKeystrokes;
+namespace Input.Native;
 
 /// <summary>
 /// Common set-1 keyboard scan codes. Cast a custom scan code to this enum when needed.

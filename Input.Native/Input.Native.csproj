@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x64</Platforms>
+    <AssemblyName>Input.Native</AssemblyName>
+    <RootNamespace>Input.Native</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

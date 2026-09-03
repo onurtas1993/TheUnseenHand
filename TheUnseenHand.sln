@@ -9,9 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheUnseenHand", "TheUnseenH
 		{D5E44DB3-EE65-7EB1-9B43-FA8B330600FD} = {D5E44DB3-EE65-7EB1-9B43-FA8B330600FD}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameKeystrokes", "GameKeystrokes\GameKeystrokes.csproj", "{D5E44DB3-EE65-7EB1-9B43-FA8B330600FD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Input.Native", "Input.Native\Input.Native.csproj", "{D5E44DB3-EE65-7EB1-9B43-FA8B330600FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameKeystrokes3", "GameKeystrokes3\GameKeystrokes3.csproj", "{572A09C3-B64E-4CE6-B7CB-D2FA8682C234}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Input.Interception", "Input.Interception\Input.Interception.csproj", "{572A09C3-B64E-4CE6-B7CB-D2FA8682C234}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Input.Abstractions", "Input.Abstractions\Input.Abstractions.csproj", "{F126DCC5-3ACF-42F5-87B4-52E46DB12985}"
 EndProject

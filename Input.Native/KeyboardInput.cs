@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 
-namespace GameKeystrokes;
+namespace Input.Native;
 
 public static class KeyboardInput
 {
