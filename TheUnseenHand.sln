@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Input.Abstractions", "Input
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vision.GameCapture", "Vision.GameCapture\Vision.GameCapture.csproj", "{74E659E8-1BD6-39C4-17FB-A4D289890728}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameVisionTester", "GameVisionTester\GameVisionTester.csproj", "{4043735D-0D68-4D2A-8943-857013B6600E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vision.RegionEditor", "Vision.RegionEditor\Vision.RegionEditor.csproj", "{4043735D-0D68-4D2A-8943-857013B6600E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Vision.Inference", "Vision.Inference\Vision.Inference.csproj", "{A021CC3A-3630-41CD-0938-07FDF14006C0}"
 EndProject

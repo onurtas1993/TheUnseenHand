@@ -155,7 +155,7 @@ Supported comparison operators are `Equals`, `NotEquals`, `LessThan`, `LessThanO
 
 ### Example saved Vision.GameCapture format
 
-The `GameVisionTester` application calculates capture regions for the parts of the game HUD the vision model needs to read. Those selections are stored in [`Vision.GameCapture/gamevision.json`](Vision.GameCapture/gamevision.json). The current example targets a popular MMORPG. Coordinates are initially supplied by the user, then adjusted in the tester until the intended area is captured precisely.
+The `Vision.RegionEditor` application calculates capture regions for the parts of the game HUD the vision model needs to read. Those selections are stored in [`Vision.GameCapture/gamevision.json`](Vision.GameCapture/gamevision.json). The current example targets a popular MMORPG. Coordinates are initially supplied by the user, then adjusted in the editor until the intended area is captured precisely.
 
 <img src="https://raw.githubusercontent.com/onurtas1993/images/refs/heads/main/gamevision_ss.png" width="567"/>
 
@@ -207,7 +207,7 @@ Behind the GUI, `Anchor` determines the reference point for `X` and `Y`; the cur
 
 Supported output types are `Text`, `Integer`, `Decimal`, and `Boolean`. Numeric outputs can specify `Minimum` and `Maximum`; integer outputs can also use `MinimumDigits` and `MaximumDigits`. Recognition results that are unreadable, incorrectly typed, or outside these constraints are discarded rather than passed to a macro condition.
 
-Use the coordinate-calculation GUI to create or adjust regions rather than calculating these values manually. The included `GameVisionTester` can then preview a configured reader and show its recognition result independently from macro execution. Recalculate the regions if the game's resolution, window layout, or UI scale changes.
+Use the coordinate-calculation GUI to create or adjust regions rather than calculating these values manually. The included `Vision.RegionEditor` can then preview a configured reader and show its recognition result independently from macro execution. Recalculate the regions if the game's resolution, window layout, or UI scale changes.
 
 ### Saved local-model format
 
@@ -236,7 +236,7 @@ Select the model exposed by your local server during setup. No model files, GPU 
 | `Input.Interception` | Interception driver-backed scan-code input and driver installation assets |
 | `Vision.GameCapture` | Foreground-window capture, region handling, and typed recognition |
 | `Vision.Inference` | Image and prompt requests to an OpenAI-compatible local endpoint |
-| `GameVisionTester` | Standalone preview and recognition diagnostics for configured regions |
+| `Vision.RegionEditor` | Capture-region editing, preview, and recognition diagnostics |
 
 
 ## Safety and responsible use

@@ -7,6 +7,8 @@
     <UseWPF>true</UseWPF> 
 	<PlatformTarget>x64</PlatformTarget> 
 	<Platforms>AnyCPU;x64</Platforms>
+    <AssemblyName>Vision.RegionEditor</AssemblyName>
+    <RootNamespace>Vision.RegionEditor</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

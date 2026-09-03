@@ -1,7 +1,7 @@
-<Window x:Class="GameVisionTester.MainWindow"
+<Window x:Class="Vision.RegionEditor.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="GameVision Tester" Width="700" Height="540" Topmost="True"
+        Title="Vision Region Editor" Width="700" Height="540" Topmost="True"
         WindowStartupLocation="CenterScreen">
     <Grid Margin="20">
         <Grid.RowDefinitions>

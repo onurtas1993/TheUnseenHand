@@ -5,7 +5,7 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Media.Imaging;
 
-namespace GameVisionTester;
+namespace Vision.RegionEditor;
 
 public partial class MainWindow : Window
 {
