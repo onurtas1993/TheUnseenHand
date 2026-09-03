@@ -44,5 +44,4 @@ public partial class ActionEditorWindow : Window
         if (e.LeftButton == MouseButtonState.Pressed)
             DragMove();
     }
-
 }

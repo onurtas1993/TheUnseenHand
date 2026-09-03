@@ -23,7 +23,10 @@ public partial class MainWindow : Window
             GameVisionResult result = await vision.ReadAsync(readerName);
             ResultTextBox.Text = FormatResult(result.Values, result.Failures);
         }
-        catch (Exception exception) { ShowError(exception); }
+        catch (Exception exception)
+        {
+            ShowError(exception);
+        }
     }
 
     private async void ReadAllButton_Click(object sender, RoutedEventArgs e)
@@ -36,7 +39,10 @@ public partial class MainWindow : Window
             PreviewImage.Source = null;
             ResultTextBox.Text = FormatResult(snapshot.Values, snapshot.Failures);
         }
-        catch (Exception exception) { ShowError(exception); }
+        catch (Exception exception)
+        {
+            ShowError(exception);
+        }
     }
 
     private string GetReaderName()

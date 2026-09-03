@@ -42,14 +42,11 @@ internal static class NativeMethods
     [StructLayout(LayoutKind.Explicit)]
     internal struct InputUnion
     {
-        [FieldOffset(0)]
-        internal MouseInput Mouse;
+        [FieldOffset(0)] internal MouseInput Mouse;
 
-        [FieldOffset(0)]
-        internal KeyboardInput Keyboard;
+        [FieldOffset(0)] internal KeyboardInput Keyboard;
 
-        [FieldOffset(0)]
-        internal HardwareInput Hardware;
+        [FieldOffset(0)] internal HardwareInput Hardware;
     }
 
     [StructLayout(LayoutKind.Sequential)]

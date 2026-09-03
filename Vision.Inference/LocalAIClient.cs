@@ -28,16 +28,17 @@ public sealed class LocalAIClient : IDisposable
                 new AuthenticationHeaderValue("Bearer", _config.ApiKey);
         }
     }
+
     public string AnalyzeImage(
-    byte[] imageBytes,
-    string prompt,
-    string mimeType = "image/png")
+        byte[] imageBytes,
+        string prompt,
+        string mimeType = "image/png")
     {
         return AnalyzeImageAsync(
-            imageBytes,
-            prompt,
-            mimeType,
-            CancellationToken.None)
+                imageBytes,
+                prompt,
+                mimeType,
+                CancellationToken.None)
             .GetAwaiter()
             .GetResult();
     }
@@ -242,5 +243,4 @@ public sealed class LocalAIClient : IDisposable
 
         return builder.Uri;
     }
-
 }

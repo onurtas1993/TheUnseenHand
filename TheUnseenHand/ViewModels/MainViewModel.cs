@@ -14,8 +14,10 @@ namespace TheUnseenHand.ViewModels;
 public class MainViewModel : INotifyPropertyChanged
 {
     private static readonly string SettingsDirectory = AppContext.BaseDirectory;
+
     private static readonly string DefaultSettingsPath =
         Path.Combine(SettingsDirectory, "macro-settings.json");
+
     private static readonly string InputSettingsPath =
         Path.Combine(SettingsDirectory, "input.json");
 
@@ -93,8 +95,8 @@ public class MainViewModel : INotifyPropertyChanged
     {
         void Apply()
         {
-            GameVisionValueItem? item = GameVisionValues.FirstOrDefault(
-                value => string.Equals(value.Source, e.Source, StringComparison.OrdinalIgnoreCase));
+            GameVisionValueItem? item = GameVisionValues.FirstOrDefault(value =>
+                string.Equals(value.Source, e.Source, StringComparison.OrdinalIgnoreCase));
             if (item is not null)
                 item.Value = e.ActualValue;
         }

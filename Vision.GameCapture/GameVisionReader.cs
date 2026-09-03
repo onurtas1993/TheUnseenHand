@@ -22,9 +22,18 @@ public sealed class GameVisionReader : IDisposable
 
     public async Task EnsureAvailableAsync(CancellationToken cancellationToken = default)
     {
-        try { await _localAi.EnsureModelAvailableAsync(cancellationToken); }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested) { throw CreateUnavailableException(); }
-        catch (HttpRequestException exception) { throw CreateUnavailableException(exception); }
+        try
+        {
+            await _localAi.EnsureModelAvailableAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw CreateUnavailableException();
+        }
+        catch (HttpRequestException exception)
+        {
+            throw CreateUnavailableException(exception);
+        }
     }
 
     public async Task<GameVisionResult> ReadAsync(string readerName, CancellationToken cancellationToken = default)
@@ -58,6 +67,7 @@ public sealed class GameVisionReader : IDisposable
             foreach ((string name, GameVisionValue value) in result.Values) values.Add(name, value);
             foreach ((string name, string failure) in result.Failures) failures.Add(name, failure);
         }
+
         return new GameVisionSnapshot { Values = values, Failures = failures };
     }
 
@@ -76,7 +86,8 @@ public sealed class GameVisionReader : IDisposable
         if (string.IsNullOrWhiteSpace(outputName))
             throw new ArgumentException("Output name cannot be empty.", nameof(outputName));
         foreach ((string readerName, GameVisionReaderConfig reader) in _config.Readers)
-            if (reader.Outputs.ContainsKey(outputName)) return readerName;
+            if (reader.Outputs.ContainsKey(outputName))
+                return readerName;
         throw new KeyNotFoundException($"GameVision output '{outputName}' is not configured.");
     }
 
@@ -84,17 +95,17 @@ public sealed class GameVisionReader : IDisposable
     {
         string outputs = string.Join(", ", reader.Outputs.Select(pair => $"\"{pair.Key}\" ({pair.Value.Type})"));
         string prompt = string.Join(Environment.NewLine,
-            reader.Prompt.Where(line => !string.IsNullOrWhiteSpace(line))) +
-            $"\nReturn one strict JSON object with these properties: {outputs}.";
+                            reader.Prompt.Where(line => !string.IsNullOrWhiteSpace(line))) +
+                        $"\nReturn one strict JSON object with these properties: {outputs}.";
         if (!RequiresNumericEvidence(reader))
             return prompt + "\nUse null for every unreadable value. Do not guess. No explanation or markdown.";
 
         return prompt +
-            "\nFor each property, return an object containing readable and value." +
-            "\nSet readable to true only when the complete value is clearly visible in the image." +
-            "\nIf a value is absent, obscured, cropped, ambiguous, or unreadable, set readable to false and value to null." +
-            "\nNever infer a value from the property name, surrounding UI, expected game mechanics, or prior knowledge." +
-            "\nDo not guess. No explanation or markdown.";
+               "\nFor each property, return an object containing readable and value." +
+               "\nSet readable to true only when the complete value is clearly visible in the image." +
+               "\nIf a value is absent, obscured, cropped, ambiguous, or unreadable, set readable to false and value to null." +
+               "\nNever infer a value from the property name, surrounding UI, expected game mechanics, or prior knowledge." +
+               "\nDo not guess. No explanation or markdown.";
     }
 
     private static object BuildResponseFormat(string readerName, GameVisionReaderConfig reader)
@@ -164,9 +175,15 @@ public sealed class GameVisionReader : IDisposable
     {
         string json = Regex.Replace(response.Trim(), @"^```(?:json)?\s*|\s*```$", string.Empty);
         JsonDocument document;
-        try { document = JsonDocument.Parse(json); }
+        try
+        {
+            document = JsonDocument.Parse(json);
+        }
         catch (JsonException exception)
-        { throw new InvalidDataException($"Local AI returned invalid JSON for reader '{readerName}': {response}", exception); }
+        {
+            throw new InvalidDataException($"Local AI returned invalid JSON for reader '{readerName}': {response}",
+                exception);
+        }
 
         using (document)
         {
@@ -179,26 +196,50 @@ public sealed class GameVisionReader : IDisposable
             foreach ((string name, GameVisionOutputConfig output) in reader.Outputs)
             {
                 if (!TryGetProperty(outputResults, name, out JsonElement result))
-                { failures[name] = "The model did not return this output."; continue; }
+                {
+                    failures[name] = "The model did not return this output.";
+                    continue;
+                }
+
                 if (!requiresEvidence)
                 {
                     if (result.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
-                    { failures[name] = "The value was unreadable."; continue; }
+                    {
+                        failures[name] = "The value was unreadable.";
+                        continue;
+                    }
+
                     try
                     {
                         object directValue = ParseValue(name, output.Type, result);
                         values[name] = new GameVisionValue(name, output.Type, directValue, readerName, capturedAt);
                     }
-                    catch (InvalidDataException exception) { failures[name] = exception.Message; }
+                    catch (InvalidDataException exception)
+                    {
+                        failures[name] = exception.Message;
+                    }
+
                     continue;
                 }
+
                 if (result.ValueKind != JsonValueKind.Object)
-                { failures[name] = "The model returned an invalid readability result."; continue; }
+                {
+                    failures[name] = "The model returned an invalid readability result.";
+                    continue;
+                }
+
                 if (!TryGetProperty(result, "readable", out JsonElement readableElement) ||
                     readableElement.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
-                { failures[name] = "The model did not return a valid readable flag."; continue; }
+                {
+                    failures[name] = "The model did not return a valid readable flag.";
+                    continue;
+                }
+
                 if (!TryGetProperty(result, "value", out JsonElement valueElement))
-                { failures[name] = "The model did not return a value property."; continue; }
+                {
+                    failures[name] = "The model did not return a value property.";
+                    continue;
+                }
 
                 bool readable = readableElement.GetBoolean();
                 bool hasValue = valueElement.ValueKind is not (JsonValueKind.Null or JsonValueKind.Undefined);
@@ -209,6 +250,7 @@ public sealed class GameVisionReader : IDisposable
                         : "The model marked the output as unreadable.";
                     continue;
                 }
+
                 if (!hasValue)
                 {
                     failures[name] = "The model marked the output readable but returned no value.";
@@ -221,21 +263,28 @@ public sealed class GameVisionReader : IDisposable
                     ValidateConfiguredValue(name, output, value);
                     values[name] = new GameVisionValue(name, output.Type, value, readerName, capturedAt);
                 }
-                catch (InvalidDataException exception) { failures[name] = exception.Message; }
+                catch (InvalidDataException exception)
+                {
+                    failures[name] = exception.Message;
+                }
             }
-            return new GameVisionResult { ReaderName = readerName, CapturedAt = capturedAt, Values = values, Failures = failures };
+
+            return new GameVisionResult
+                { ReaderName = readerName, CapturedAt = capturedAt, Values = values, Failures = failures };
         }
     }
 
     private static object ParseValue(string name, GameVisionValueType type, JsonElement element) => type switch
     {
         GameVisionValueType.Text when element.ValueKind == JsonValueKind.String &&
-            !string.IsNullOrWhiteSpace(element.GetString()) &&
-            !string.Equals(element.GetString(), "UNKNOWN", StringComparison.OrdinalIgnoreCase) =>
+                                      !string.IsNullOrWhiteSpace(element.GetString()) &&
+                                      !string.Equals(element.GetString(), "UNKNOWN",
+                                          StringComparison.OrdinalIgnoreCase) =>
             Regex.Replace(element.GetString()!.Trim(), @"\s+", " "),
         GameVisionValueType.Integer when element.TryGetInt64(out long integer) => integer,
         GameVisionValueType.Decimal when element.TryGetDecimal(out decimal number) => number,
-        GameVisionValueType.Boolean when element.ValueKind is JsonValueKind.True or JsonValueKind.False => element.GetBoolean(),
+        GameVisionValueType.Boolean when element.ValueKind is JsonValueKind.True or JsonValueKind.False => element
+            .GetBoolean(),
         _ => throw new InvalidDataException($"Output '{name}' is not a valid {type}.")
     };
 
@@ -251,9 +300,11 @@ public sealed class GameVisionReader : IDisposable
                 ? 1
                 : Math.Abs((decimal)integer).ToString("0", System.Globalization.CultureInfo.InvariantCulture).Length;
             if (output.MinimumDigits is int minimumDigits && digits < minimumDigits)
-                throw new InvalidDataException($"Output '{name}' has {digits} digits; at least {minimumDigits} are required.");
+                throw new InvalidDataException(
+                    $"Output '{name}' has {digits} digits; at least {minimumDigits} are required.");
             if (output.MaximumDigits is int maximumDigits && digits > maximumDigits)
-                throw new InvalidDataException($"Output '{name}' has {digits} digits; at most {maximumDigits} are allowed.");
+                throw new InvalidDataException(
+                    $"Output '{name}' has {digits} digits; at most {maximumDigits} are allowed.");
         }
 
         if (output.Type is GameVisionValueType.Integer or GameVisionValueType.Decimal)
@@ -270,7 +321,11 @@ public sealed class GameVisionReader : IDisposable
     {
         foreach (JsonProperty property in element.EnumerateObject())
             if (string.Equals(property.Name, name, StringComparison.OrdinalIgnoreCase))
-            { value = property.Value; return true; }
+            {
+                value = property.Value;
+                return true;
+            }
+
         value = default;
         return false;
     }
@@ -286,14 +341,24 @@ public sealed class GameVisionReader : IDisposable
     private async Task<string> AnalyzeImageAsync(byte[] imageBytes, string prompt,
         CancellationToken cancellationToken, object responseFormat)
     {
-        try { return await _localAi.AnalyzeImageAsync(imageBytes, prompt,
-            cancellationToken: cancellationToken, responseFormat: responseFormat); }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested) { throw CreateUnavailableException(); }
-        catch (HttpRequestException exception) { throw CreateUnavailableException(exception); }
+        try
+        {
+            return await _localAi.AnalyzeImageAsync(imageBytes, prompt,
+                cancellationToken: cancellationToken, responseFormat: responseFormat);
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
+        {
+            throw CreateUnavailableException();
+        }
+        catch (HttpRequestException exception)
+        {
+            throw CreateUnavailableException(exception);
+        }
     }
 
     private InvalidOperationException CreateUnavailableException(Exception? innerException = null) => new(
-        $"Local AI is unavailable at '{_localAiConfig.BaseUrl}'. Start LM Studio, enable its local server, and load model '{_localAiConfig.Model}'.", innerException);
+        $"Local AI is unavailable at '{_localAiConfig.BaseUrl}'. Start LM Studio, enable its local server, and load model '{_localAiConfig.Model}'.",
+        innerException);
 
     public void Dispose() => _localAi.Dispose();
 }

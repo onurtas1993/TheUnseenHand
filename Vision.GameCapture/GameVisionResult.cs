@@ -1,16 +1,22 @@
 namespace Vision.GameCapture;
 
-public sealed record GameVisionValue(string Name, GameVisionValueType Type, object Value,
-    string ReaderName, DateTimeOffset CapturedAt)
+public sealed record GameVisionValue(
+    string Name,
+    GameVisionValueType Type,
+    object Value,
+    string ReaderName,
+    DateTimeOffset CapturedAt)
 {
     public string GetText() => Type == GameVisionValueType.Text ? (string)Value : throw WrongType("Text");
     public long GetInteger() => Type == GameVisionValueType.Integer ? (long)Value : throw WrongType("Integer");
+
     public decimal GetDecimal() => Type switch
     {
         GameVisionValueType.Decimal => (decimal)Value,
         GameVisionValueType.Integer => (long)Value,
         _ => throw WrongType("Decimal")
     };
+
     public bool GetBoolean() => Type == GameVisionValueType.Boolean ? (bool)Value : throw WrongType("Boolean");
     private InvalidOperationException WrongType(string expected) => new($"Output '{Name}' is {Type}, not {expected}.");
 }

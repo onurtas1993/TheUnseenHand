@@ -21,7 +21,7 @@ public sealed class InputSettings
         };
 
         InputSettings settings = JsonSerializer.Deserialize<InputSettings>(json, options)
-            ?? throw new InvalidDataException("The input configuration file is empty or invalid.");
+                                 ?? throw new InvalidDataException("The input configuration file is empty or invalid.");
 
         if (settings.SchemaVersion != 1)
         {

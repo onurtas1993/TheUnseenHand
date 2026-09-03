@@ -36,7 +36,7 @@ public class MacroJsonService : IMacroJsonService
         string json = await File.ReadAllTextAsync(filePath);
 
         AppSettings settings = JsonSerializer.Deserialize<AppSettings>(json, _options)
-            ?? throw new InvalidDataException("The settings file is empty or invalid.");
+                               ?? throw new InvalidDataException("The settings file is empty or invalid.");
 
         if (settings.SchemaVersion != 5)
             throw new InvalidDataException(

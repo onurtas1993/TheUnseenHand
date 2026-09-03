@@ -159,7 +159,7 @@ public class MacroExecutionService : IMacroExecutionService
         KeyboardProvider keyboardProvider)
     {
         MacroCondition condition = action.Condition
-            ?? throw new InvalidOperationException("The IF action has no condition.");
+                                   ?? throw new InvalidOperationException("The IF action has no condition.");
 
         if (action.Actions.Count == 0 && action.ElseActions.Count == 0)
             return true;
@@ -247,7 +247,8 @@ public class MacroExecutionService : IMacroExecutionService
         {
             if (comparison is not (ComparisonOperator.Equals or ComparisonOperator.NotEquals) ||
                 !bool.TryParse(expected, out bool expectedBoolean))
-                throw new InvalidOperationException($"Boolean output '{value.Name}' requires Equals/NotEquals and true or false.");
+                throw new InvalidOperationException(
+                    $"Boolean output '{value.Name}' requires Equals/NotEquals and true or false.");
             bool equals = value.GetBoolean() == expectedBoolean;
             return comparison == ComparisonOperator.Equals ? equals : !equals;
         }

@@ -186,7 +186,9 @@ public static class KeyboardInput
 
     private sealed class InterceptionContextHandle : SafeHandleZeroOrMinusOneIsInvalid
     {
-        private InterceptionContextHandle() : base(ownsHandle: true) { }
+        private InterceptionContextHandle() : base(ownsHandle: true)
+        {
+        }
 
         protected override bool ReleaseHandle()
         {
@@ -199,10 +201,12 @@ public static class KeyboardInput
     {
         private const string LibraryName = "interception.dll";
 
-        [DllImport(LibraryName, EntryPoint = "interception_create_context", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(LibraryName, EntryPoint = "interception_create_context",
+            CallingConvention = CallingConvention.Cdecl)]
         internal static extern InterceptionContextHandle CreateContext();
 
-        [DllImport(LibraryName, EntryPoint = "interception_destroy_context", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(LibraryName, EntryPoint = "interception_destroy_context",
+            CallingConvention = CallingConvention.Cdecl)]
         internal static extern void DestroyContext(IntPtr context);
 
         [DllImport(LibraryName, EntryPoint = "interception_send", CallingConvention = CallingConvention.Cdecl)]
@@ -212,7 +216,8 @@ public static class KeyboardInput
             ref KeyStroke stroke,
             uint strokeCount);
 
-        [DllImport(LibraryName, EntryPoint = "interception_get_hardware_id", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport(LibraryName, EntryPoint = "interception_get_hardware_id",
+            CallingConvention = CallingConvention.Cdecl)]
         internal static extern uint GetHardwareId(
             InterceptionContextHandle context,
             int device,

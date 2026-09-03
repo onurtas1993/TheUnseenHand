@@ -5,40 +5,40 @@
         WindowStartupLocation="CenterScreen">
     <Grid Margin="20">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="260"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="260" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="12"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <TextBlock Text="Reader name" VerticalAlignment="Center"/>
+            <TextBlock Text="Reader name" VerticalAlignment="Center" />
             <TextBox x:Name="ReaderNameTextBox" Grid.Column="2"
-                     ToolTip="A reader name from gamevision.json"/>
+                     ToolTip="A reader name from gamevision.json" />
         </Grid>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,15">
             <Button Content="Test Reader" Width="130" Height="35"
-                    Click="PreviewReaderButton_Click"/>
+                    Click="PreviewReaderButton_Click" />
             <Button Content="Read Game State" Width="145" Height="35" Margin="12,0,0,0"
-                    Click="ReadAllButton_Click"/>
+                    Click="ReadAllButton_Click" />
         </StackPanel>
 
         <Border Grid.Row="2" BorderBrush="Gray" BorderThickness="1" Background="Black">
-            <Image x:Name="PreviewImage" Stretch="None"/>
+            <Image x:Name="PreviewImage" Stretch="None" />
         </Border>
 
         <TextBlock Grid.Row="3" Text="Generic JSON result"
-                   FontWeight="Bold" Margin="0,15,0,5"/>
+                   FontWeight="Bold" Margin="0,15,0,5" />
 
         <TextBox x:Name="ResultTextBox" Grid.Row="4" IsReadOnly="True"
                  AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
-                 HorizontalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="14"/>
+                 HorizontalScrollBarVisibility="Auto" FontFamily="Consolas" FontSize="14" />
     </Grid>
 </Window>

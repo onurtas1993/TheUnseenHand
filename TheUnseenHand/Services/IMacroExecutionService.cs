@@ -1,5 +1,4 @@
 ﻿using TheUnseenHand.Models;
-
 using Input.Abstractions;
 
 namespace TheUnseenHand.Services;

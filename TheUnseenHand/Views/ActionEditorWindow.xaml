@@ -9,30 +9,30 @@
 
     <Window.Resources>
         <DataTemplate DataType="{x:Type actionEditors:PressActionViewModel}">
-            <actionEditorViews:PressActionView/>
+            <actionEditorViews:PressActionView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type actionEditors:WaitActionViewModel}">
-            <actionEditorViews:WaitActionView/>
+            <actionEditorViews:WaitActionView />
         </DataTemplate>
         <DataTemplate DataType="{x:Type actionEditors:IfActionViewModel}">
-            <actionEditorViews:IfActionView/>
+            <actionEditorViews:IfActionView />
         </DataTemplate>
- 
+
         <Style x:Key="ImageButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Foreground" Value="White" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Grid>
-                            <Image x:Name="ButtonImage" Source="/Assets/unclicked_button.png" Stretch="Fill"/>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Image x:Name="ButtonImage" Source="/Assets/unclicked_button.png" Stretch="Fill" />
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="ButtonImage" Property="Source" Value="/Assets/clicked_button.png"/>
+                                <Setter TargetName="ButtonImage" Property="Source" Value="/Assets/clicked_button.png" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.5"/>
+                                <Setter Property="Opacity" Value="0.5" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -42,49 +42,49 @@
     </Window.Resources>
 
     <Grid Background="Transparent">
-        <Image Source="/Assets/PremiumBack.png" Stretch="Fill" IsHitTestVisible="False"/>
+        <Image Source="/Assets/PremiumBack.png" Stretch="Fill" IsHitTestVisible="False" />
 
         <Grid Margin="52,60,52,62">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="16"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="16" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <Grid Margin="10,0,10,0">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="6"/>
-                    <ColumnDefinition Width="70"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="70" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Action Type:" FontSize="15" FontWeight="SemiBold"
-                           VerticalAlignment="Center" Foreground="White"/>
+                           VerticalAlignment="Center" Foreground="White" />
                 <ComboBox Grid.Column="2" ItemsSource="{Binding ActionTypes}"
-                          SelectedItem="{Binding SelectedActionType}"/>
+                          SelectedItem="{Binding SelectedActionType}" />
                 <StackPanel Grid.Column="3" Orientation="Horizontal"
-            HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom">
                     <Button Content="Cancel" Width="80" Height="35" Margin="0,0,10,0"
-            Style="{StaticResource ImageButtonStyle}" IsCancel="True"/>
+                            Style="{StaticResource ImageButtonStyle}" IsCancel="True" />
                     <Button Content="OK" Width="80" Height="35"
-            Style="{StaticResource ImageButtonStyle}" IsDefault="True"
-            Click="OkButton_Click"/>
+                            Style="{StaticResource ImageButtonStyle}" IsDefault="True"
+                            Click="OkButton_Click" />
                 </StackPanel>
             </Grid>
 
             <Border Grid.Row="2" Padding="10" Background="#33000000"
                     BorderBrush="#66FFFFFF" BorderThickness="1" CornerRadius="3">
-                <ContentControl Content="{Binding CurrentEditor}" VerticalAlignment="Center"/>
+                <ContentControl Content="{Binding CurrentEditor}" VerticalAlignment="Center" />
             </Border>
 
-            
+
         </Grid>
 
         <TextBlock Text="Action Editor" HorizontalAlignment="Center" VerticalAlignment="Top"
                    Margin="0,26,0,0" FontSize="16" FontWeight="SemiBold"
-                   IsHitTestVisible="False"/>
+                   IsHitTestVisible="False" />
 
         <Border Height="50" VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                Background="Transparent" MouseLeftButtonDown="DragArea_MouseLeftButtonDown"/>
+                Background="Transparent" MouseLeftButtonDown="DragArea_MouseLeftButtonDown" />
     </Grid>
 </Window>

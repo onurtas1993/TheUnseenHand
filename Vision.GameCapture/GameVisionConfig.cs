@@ -6,6 +6,7 @@ namespace Vision.GameCapture;
 public sealed class GameVisionConfig
 {
     public string ExecutableName { get; set; } = string.Empty;
+
     public Dictionary<string, GameVisionReaderConfig> Readers { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
 
@@ -81,10 +82,12 @@ public sealed class GameVisionConfig
                     throw new InvalidOperationException($"Output '{outputName}' has invalid digit limits.");
                 if ((output.MinimumDigits is not null || output.MaximumDigits is not null) &&
                     output.Type != GameVisionValueType.Integer)
-                    throw new InvalidOperationException($"Output '{outputName}' can use digit limits only with Type Integer.");
+                    throw new InvalidOperationException(
+                        $"Output '{outputName}' can use digit limits only with Type Integer.");
                 if ((output.Minimum is not null || output.Maximum is not null) &&
                     output.Type is not (GameVisionValueType.Integer or GameVisionValueType.Decimal))
-                    throw new InvalidOperationException($"Output '{outputName}' can use Minimum/Maximum only with a numeric type.");
+                    throw new InvalidOperationException(
+                        $"Output '{outputName}' can use Minimum/Maximum only with a numeric type.");
             }
         }
     }
@@ -94,6 +97,7 @@ public sealed class GameVisionReaderConfig
 {
     public ScreenRegion Region { get; set; } = new();
     public List<string> Prompt { get; set; } = new();
+
     public Dictionary<string, GameVisionOutputConfig> Outputs { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
 }
@@ -107,4 +111,10 @@ public sealed class GameVisionOutputConfig
     public int? MaximumDigits { get; set; }
 }
 
-public enum GameVisionValueType { Text, Integer, Decimal, Boolean }
+public enum GameVisionValueType
+{
+    Text,
+    Integer,
+    Decimal,
+    Boolean
+}
