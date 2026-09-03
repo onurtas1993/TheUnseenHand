@@ -30,6 +30,18 @@ Build AI-powered game macros that see game state, make intelligent decisions, an
   </tr>
 </table>
 
+## Screenshot of the latest version of the application
+
+<table> 
+    <tr> 
+    <td>
+<img src="https://raw.githubusercontent.com/onurtas1993/images/refs/heads/main/unseen_hand_ss.jpg"/>
+    </td>
+    <td>
+<img src="https://raw.githubusercontent.com/onurtas1993/images/refs/heads/main/unseen_hand_ss2.jpg"/>
+    </td>
+  </tr> 
+</table>
 
 The Unseen Hand is a Windows game macro creator for building self-playing character routines. It goes beyond a fixed key repeater: the macro can read information such as HP, MP, stats, or the current target from the game screen, then choose what the character should do through nested `THEN` and `ELSE` action sequences.
 
