@@ -23,6 +23,11 @@ Build AI-powered game macros that see game state, make intelligent decisions, an
 <img src="https://raw.githubusercontent.com/onurtas1993/images/refs/heads/main/unseen_hand_demo.gif"/>
     </td>
   </tr>
+    <tr> 
+    <td>
+<img src="https://raw.githubusercontent.com/onurtas1993/images/refs/heads/main/unseen_hand_demo2.gif"/>
+    </td>
+  </tr>
 </table>
 
 
@@ -49,7 +54,9 @@ Create rotations, recovery rules, target-dependent attacks, movement fallbacks, 
 ```text
 WPF macro editor
       |
-      +-- Press / Wait --> Input.Abstractions --> Input.Native / Input.Interception --> target window
+      +-- Press / Wait --> Input.Abstractions --> selected input provider --> target window
+      |                                      |--> Input.Native (SendInput)
+      |                                      +--> Input.Interception (driver)
       |
       +-- If condition --> GameVision --> LocalAIAdapter --> LM Studio
                               |
@@ -63,6 +70,7 @@ Each macro runs as a continuous gameplay loop. Before an action is executed, the
 - Windows 10 version 2004 or newer
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - Unseen Hand must run as administrator when the target app is also running as administrator.
+- The `Interception` input provider additionally requires its keyboard filter driver to be installed.
 - For vision conditions:
   - [LM Studio](https://lmstudio.ai/) with its local server enabled
   - `ggml-org/GLM-OCR-GGUF` vision model needs to be installed
@@ -78,20 +86,44 @@ On startup, the app loads its default macro profile. Build and maintain profiles
 
 The GUI is the normal way to configure The Unseen Hand. Add key presses and waits, create vision-based conditions, arrange nested branches, and use the coordinate tools to select the game areas that should be read. Save the finished setup as a reusable profile, then press **Start** to let the character run the gameplay loop.
 
-The project stores this configuration in three JSON files behind the scenes:
+The project stores its configuration in four JSON files behind the scenes:
 
 | File | Purpose |
 | --- | --- |
 | [`TheUnseenHand/macro-settings.json`](TheUnseenHand/macro-settings.json) | Target process and ordered macro actions |
+| [`Input.Abstractions/input.json`](Input.Abstractions/input.json) | Keyboard input provider selection |
 | [`GameVision/gamevision.json`](GameVision/gamevision.json) | Capture regions, prompts, output types, and validation rules |
 | [`LocalAIAdapter/localai.json`](LocalAIAdapter/localai.json) | Local model endpoint, model name, timeout, and inference settings |
+
+### Keyboard input provider
+
+Keyboard-provider selection is infrastructure configuration and is intentionally separate from saved macro profiles. Configure it only in [`Input.Abstractions/input.json`](Input.Abstractions/input.json):
+
+```json
+{
+  "schemaVersion": 1,
+  "keyboardProvider": "Interception"
+}
+```
+
+Supported values are:
+
+- `Windows` uses `Input.Native` and the Windows `SendInput` API. It requires no additional installation. Try this first, if the target application does not receive inputs, then some anti-tampering software might be blocking he input simulations sent from Windows and you have to proceed with the below way.
+- `Interception` uses `Input.Interception` and its driver-backed scan-code injection. Install the driver from an Administrator Command Prompt and reboot before using it:
+
+```bat
+cd /d D:\repo\TheUnseenHand\Input.Interception\tools
+install-interception.exe /install
+```
+
+To remove the driver, run `install-interception.exe /uninstall` from the same elevated prompt and reboot. The input-provider choice is global for the application; loading or saving `macro-settings.json` does not read, write, or change it.
 
 > [!IMPORTANT]
 > The JSON shown below is a presentation of what the GUI saves and a reference for developers and contributors. Players should use the GUI to create actions, calculate capture coordinates, configure vision readers, and save profiles instead of editing these files by hand.
 
 ### Saved macro format
 
-The macro editor saves the target game and its nested action tree in `macro-settings.json`. A saved profile looks like this:
+The macro editor saves only the target game and its nested action tree in `macro-settings.json`. Keyboard-provider selection is not part of a saved macro. A saved profile looks like this:
 
 ```json
 {
@@ -199,9 +231,9 @@ Select the model exposed by your local server during setup. No model files, GPU 
 | Project | Responsibility |
 | --- | --- |
 | `TheUnseenHand` | Gamer-facing WPF macro creator, profiles, and gameplay-loop execution |
-| `Input.Abstractions` | Shared keyboard-input contract and provider configuration |
-| `Input.Native` | Windows target-window discovery and native `SendInput` keyboard input |
-| `Input.Interception` | Driver-backed Interception keyboard input |
+| `Input.Abstractions` | Shared `IKeyboardInput` contract and the independent `input.json` provider configuration |
+| `Input.Native` | Windows target-window discovery and `SendInput`-based keyboard input |
+| `Input.Interception` | Interception driver-backed scan-code input and driver installation assets |
 | `GameVision` | Foreground-window capture, region handling, and typed recognition |
 | `LocalAIAdapter` | Image and prompt requests to an OpenAI-compatible local endpoint |
 | `GameVisionTester` | Standalone preview and recognition diagnostics for configured regions |
