@@ -61,7 +61,7 @@ public class ActionEditorViewModel : INotifyPropertyChanged
 
         if (CurrentEditor is IfActionViewModel conditionEditor &&
             string.IsNullOrWhiteSpace(conditionEditor.Source))
-            throw new InvalidOperationException("Enter a GameVision output name.");
+            throw new InvalidOperationException("Enter a game-capture output name.");
 
         if (CurrentEditor is IfActionViewModel intervalEditor &&
             intervalEditor.CheckIntervalMilliseconds < 0)

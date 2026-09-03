@@ -3,14 +3,14 @@ using System.Text.Json.Serialization;
 
 namespace Vision.GameCapture;
 
-public sealed class GameVisionConfig
+public sealed class GameCaptureConfig
 {
     public string ExecutableName { get; set; } = string.Empty;
 
-    public Dictionary<string, GameVisionReaderConfig> Readers { get; set; } =
+    public Dictionary<string, GameCaptureReaderConfig> Readers { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
 
-    public static GameVisionConfig Load(string path)
+    public static GameCaptureConfig Load(string path)
     {
         if (!File.Exists(path))
         {
@@ -30,7 +30,7 @@ public sealed class GameVisionConfig
         };
 
         var config =
-            JsonSerializer.Deserialize<GameVisionConfig>(
+            JsonSerializer.Deserialize<GameCaptureConfig>(
                 json,
                 options);
 
@@ -48,12 +48,12 @@ public sealed class GameVisionConfig
     {
         if (string.IsNullOrWhiteSpace(ExecutableName))
             throw new InvalidOperationException("ExecutableName is missing from Vision.GameCapture configuration.");
-        Readers = new Dictionary<string, GameVisionReaderConfig>(Readers, StringComparer.OrdinalIgnoreCase);
+        Readers = new Dictionary<string, GameCaptureReaderConfig>(Readers, StringComparer.OrdinalIgnoreCase);
         if (Readers.Count == 0)
             throw new InvalidOperationException("At least one reader must be configured.");
 
         var outputNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach ((string readerName, GameVisionReaderConfig reader) in Readers)
+        foreach ((string readerName, GameCaptureReaderConfig reader) in Readers)
         {
             if (string.IsNullOrWhiteSpace(readerName))
                 throw new InvalidOperationException("Reader names cannot be empty.");
@@ -64,7 +64,7 @@ public sealed class GameVisionConfig
             if (reader.Outputs.Count == 0)
                 throw new InvalidOperationException($"Reader '{readerName}' has no outputs.");
 
-            reader.Outputs = new Dictionary<string, GameVisionOutputConfig>(
+            reader.Outputs = new Dictionary<string, GameCaptureOutputConfig>(
                 reader.Outputs, StringComparer.OrdinalIgnoreCase);
 
             foreach (string outputName in reader.Outputs.Keys)
@@ -74,18 +74,18 @@ public sealed class GameVisionConfig
                 if (!outputNames.Add(outputName))
                     throw new InvalidOperationException($"Output name '{outputName}' is configured more than once.");
 
-                GameVisionOutputConfig output = reader.Outputs[outputName];
+                GameCaptureOutputConfig output = reader.Outputs[outputName];
                 if (output.Minimum > output.Maximum)
                     throw new InvalidOperationException($"Output '{outputName}' has Minimum greater than Maximum.");
                 if (output.MinimumDigits is <= 0 || output.MaximumDigits is <= 0 ||
                     output.MinimumDigits > output.MaximumDigits)
                     throw new InvalidOperationException($"Output '{outputName}' has invalid digit limits.");
                 if ((output.MinimumDigits is not null || output.MaximumDigits is not null) &&
-                    output.Type != GameVisionValueType.Integer)
+                    output.Type != GameCaptureValueType.Integer)
                     throw new InvalidOperationException(
                         $"Output '{outputName}' can use digit limits only with Type Integer.");
                 if ((output.Minimum is not null || output.Maximum is not null) &&
-                    output.Type is not (GameVisionValueType.Integer or GameVisionValueType.Decimal))
+                    output.Type is not (GameCaptureValueType.Integer or GameCaptureValueType.Decimal))
                     throw new InvalidOperationException(
                         $"Output '{outputName}' can use Minimum/Maximum only with a numeric type.");
             }
@@ -93,25 +93,25 @@ public sealed class GameVisionConfig
     }
 }
 
-public sealed class GameVisionReaderConfig
+public sealed class GameCaptureReaderConfig
 {
     public ScreenRegion Region { get; set; } = new();
     public List<string> Prompt { get; set; } = new();
 
-    public Dictionary<string, GameVisionOutputConfig> Outputs { get; set; } =
+    public Dictionary<string, GameCaptureOutputConfig> Outputs { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
 }
 
-public sealed class GameVisionOutputConfig
+public sealed class GameCaptureOutputConfig
 {
-    public GameVisionValueType Type { get; set; } = GameVisionValueType.Text;
+    public GameCaptureValueType Type { get; set; } = GameCaptureValueType.Text;
     public decimal? Minimum { get; set; }
     public decimal? Maximum { get; set; }
     public int? MinimumDigits { get; set; }
     public int? MaximumDigits { get; set; }
 }
 
-public enum GameVisionValueType
+public enum GameCaptureValueType
 {
     Text,
     Integer,

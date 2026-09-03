@@ -2,7 +2,7 @@ using System.Text.Json;
 
 namespace Vision.Inference;
 
-public sealed class LocalAIConfig
+public sealed class InferenceConfig
 {
     public string BaseUrl { get; set; } = "http://localhost:1234/v1";
     public string Model { get; set; } = string.Empty;
@@ -11,13 +11,13 @@ public sealed class LocalAIConfig
     public double Temperature { get; set; } = 0.0;
     public int TimeoutSeconds { get; set; } = 60;
 
-    public static LocalAIConfig Load(string path)
+    public static InferenceConfig Load(string path)
     {
         if (!File.Exists(path))
             throw new FileNotFoundException($"Local AI configuration file was not found: {path}");
 
         var json = File.ReadAllText(path);
-        var config = JsonSerializer.Deserialize<LocalAIConfig>(json,
+        var config = JsonSerializer.Deserialize<InferenceConfig>(json,
             new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         if (config is null)

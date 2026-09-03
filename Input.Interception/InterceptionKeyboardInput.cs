@@ -5,12 +5,12 @@ namespace Input.Interception;
 public sealed class InterceptionKeyboardInput : IKeyboardInput
 {
     public Task TapAsync(string key, CancellationToken cancellationToken = default) =>
-        KeyboardInput.TapAsync(key, cancellationToken);
+        InterceptionKeyboardSender.TapAsync(key, cancellationToken);
 
     public Task<bool> HoldAsync(
         string key,
         int durationMilliseconds,
         Func<bool>? shouldContinue = null,
         CancellationToken cancellationToken = default) =>
-        KeyboardInput.HoldAsync(key, durationMilliseconds, shouldContinue, cancellationToken);
+        InterceptionKeyboardSender.HoldAsync(key, durationMilliseconds, shouldContinue, cancellationToken);
 }

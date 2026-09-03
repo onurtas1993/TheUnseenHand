@@ -33,7 +33,7 @@ public class MainViewModel : INotifyPropertyChanged
 
     public ObservableCollection<MacroAction> Actions { get; } = new();
     public ObservableCollection<MacroTreeNode> MacroTree { get; } = new();
-    public ObservableCollection<GameVisionValueItem> GameVisionValues { get; } = new();
+    public ObservableCollection<GameCaptureValueItem> GameCaptureValues { get; } = new();
 
     public MacroAction? SelectedAction
     {
@@ -95,7 +95,7 @@ public class MainViewModel : INotifyPropertyChanged
     {
         void Apply()
         {
-            GameVisionValueItem? item = GameVisionValues.FirstOrDefault(value =>
+            GameCaptureValueItem? item = GameCaptureValues.FirstOrDefault(value =>
                 string.Equals(value.Source, e.Source, StringComparison.OrdinalIgnoreCase));
             if (item is not null)
                 item.Value = e.ActualValue;
@@ -119,18 +119,18 @@ public class MainViewModel : INotifyPropertyChanged
             _subscribedActions.Add(action);
         }
 
-        RefreshGameVisionValues();
+        RefreshGameCaptureValues();
         RefreshMacroTree();
     }
 
     private void Action_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        RefreshGameVisionValues();
+        RefreshGameCaptureValues();
     }
 
-    public void RefreshGameVisionValues()
+    public void RefreshGameCaptureValues()
     {
-        var previousValues = GameVisionValues.ToDictionary(
+        var previousValues = GameCaptureValues.ToDictionary(
             item => item.Source,
             item => item.Value,
             StringComparer.OrdinalIgnoreCase);
@@ -139,10 +139,10 @@ public class MainViewModel : INotifyPropertyChanged
 
         CollectConditionSources(Actions, sources, seen);
 
-        GameVisionValues.Clear();
+        GameCaptureValues.Clear();
         foreach (string source in sources)
         {
-            GameVisionValues.Add(new GameVisionValueItem(
+            GameCaptureValues.Add(new GameCaptureValueItem(
                 source,
                 previousValues.GetValueOrDefault(source, "--")));
         }
@@ -379,7 +379,7 @@ public class MainViewModel : INotifyPropertyChanged
 
         node.ContainingActions.Remove(node.Action);
         SelectedTreeNode = null;
-        RefreshGameVisionValues();
+        RefreshGameCaptureValues();
         RefreshMacroTree();
     }
 
@@ -409,11 +409,11 @@ public sealed class MacroTreeNode
     public ObservableCollection<MacroTreeNode> Children { get; } = new();
 }
 
-public sealed class GameVisionValueItem : INotifyPropertyChanged
+public sealed class GameCaptureValueItem : INotifyPropertyChanged
 {
     private string _value;
 
-    public GameVisionValueItem(string source, string value)
+    public GameCaptureValueItem(string source, string value)
     {
         Source = source;
         _value = value;

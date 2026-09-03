@@ -10,17 +10,17 @@ namespace TheUnseenHand.Services;
 public class MacroExecutionService : IMacroExecutionService
 {
     private static readonly TimeSpan FocusPollInterval = TimeSpan.FromMilliseconds(50);
-    private readonly Lazy<GameVisionReader> _vision;
+    private readonly Lazy<GameCaptureReader> _gameCapture;
     private readonly IReadOnlyDictionary<KeyboardProvider, IKeyboardInput> _keyboardInputs;
     private readonly Dictionary<MacroAction, DateTimeOffset> _lastIfChecks = new();
 
     public event EventHandler<GameStateReadEventArgs>? GameStateRead;
 
     public MacroExecutionService(
-        GameVisionReader? vision = null,
+        GameCaptureReader? gameCapture = null,
         IReadOnlyDictionary<KeyboardProvider, IKeyboardInput>? keyboardInputs = null)
     {
-        _vision = new Lazy<GameVisionReader>(() => vision ?? new GameVisionReader(
+        _gameCapture = new Lazy<GameCaptureReader>(() => gameCapture ?? new GameCaptureReader(
             Path.Combine(AppContext.BaseDirectory, "gamevision.json"),
             Path.Combine(AppContext.BaseDirectory, "localai.json")));
         _keyboardInputs = keyboardInputs ?? new Dictionary<KeyboardProvider, IKeyboardInput>
@@ -56,7 +56,7 @@ public class MacroExecutionService : IMacroExecutionService
         ResetIntervalHistory();
 
         if (ContainsVisionCondition(actionList))
-            await _vision.Value.EnsureAvailableAsync(cancellationToken);
+            await _gameCapture.Value.EnsureAvailableAsync(cancellationToken);
 
         WindowTarget target = WindowTarget.FromProcessName(processName);
         await target.FocusAsync(cancellationToken: cancellationToken);
@@ -181,7 +181,7 @@ public class MacroExecutionService : IMacroExecutionService
 
         try
         {
-            GameVisionValue? value = await ReadCachedValueAsync(
+            GameCaptureValue? value = await ReadCachedValueAsync(
                 condition.Source, visionCache, cancellationToken);
             if (value is null)
                 return true;
@@ -217,24 +217,24 @@ public class MacroExecutionService : IMacroExecutionService
         }
     }
 
-    private async Task<GameVisionValue?> ReadCachedValueAsync(
+    private async Task<GameCaptureValue?> ReadCachedValueAsync(
         string outputName,
         VisionReadCache cache,
         CancellationToken cancellationToken)
     {
-        string readerName = _vision.Value.GetReaderNameForOutput(outputName);
-        if (!cache.Results.TryGetValue(readerName, out GameVisionResult? result))
+        string readerName = _gameCapture.Value.GetReaderNameForOutput(outputName);
+        if (!cache.Results.TryGetValue(readerName, out GameCaptureResult? result))
         {
-            result = await _vision.Value.ReadAsync(readerName, cancellationToken);
+            result = await _gameCapture.Value.ReadAsync(readerName, cancellationToken);
             cache.Results.Add(readerName, result);
         }
 
         return result.Values.GetValueOrDefault(outputName);
     }
 
-    private static bool Compare(GameVisionValue value, ComparisonOperator comparison, string expected)
+    private static bool Compare(GameCaptureValue value, ComparisonOperator comparison, string expected)
     {
-        if (value.Type == GameVisionValueType.Text)
+        if (value.Type == GameCaptureValueType.Text)
         {
             if (comparison is not (ComparisonOperator.Equals or ComparisonOperator.NotEquals))
                 throw new InvalidOperationException($"Text output '{value.Name}' only supports Equals and NotEquals.");
@@ -243,7 +243,7 @@ public class MacroExecutionService : IMacroExecutionService
             return comparison == ComparisonOperator.Equals ? equals : !equals;
         }
 
-        if (value.Type == GameVisionValueType.Boolean)
+        if (value.Type == GameCaptureValueType.Boolean)
         {
             if (comparison is not (ComparisonOperator.Equals or ComparisonOperator.NotEquals) ||
                 !bool.TryParse(expected, out bool expectedBoolean))
@@ -302,7 +302,7 @@ public class MacroExecutionService : IMacroExecutionService
 
     private sealed class VisionReadCache
     {
-        public Dictionary<string, GameVisionResult> Results { get; } =
+        public Dictionary<string, GameCaptureResult> Results { get; } =
             new(StringComparer.OrdinalIgnoreCase);
     }
 

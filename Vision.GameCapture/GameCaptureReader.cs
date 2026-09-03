@@ -7,24 +7,24 @@ using Vision.Inference;
 
 namespace Vision.GameCapture;
 
-public sealed class GameVisionReader : IDisposable
+public sealed class GameCaptureReader : IDisposable
 {
-    private readonly GameVisionConfig _config;
-    private readonly LocalAIConfig _localAiConfig;
-    private readonly LocalAIClient _localAi;
+    private readonly GameCaptureConfig _config;
+    private readonly InferenceConfig _inferenceConfig;
+    private readonly InferenceClient _inference;
 
-    public GameVisionReader(string configPath = "gamevision.json", string localAiConfigPath = "localai.json")
+    public GameCaptureReader(string configPath = "gamevision.json", string inferenceConfigPath = "localai.json")
     {
-        _config = GameVisionConfig.Load(configPath);
-        _localAiConfig = LocalAIConfig.Load(localAiConfigPath);
-        _localAi = new LocalAIClient(_localAiConfig);
+        _config = GameCaptureConfig.Load(configPath);
+        _inferenceConfig = InferenceConfig.Load(inferenceConfigPath);
+        _inference = new InferenceClient(_inferenceConfig);
     }
 
     public async Task EnsureAvailableAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            await _localAi.EnsureModelAvailableAsync(cancellationToken);
+            await _inference.EnsureModelAvailableAsync(cancellationToken);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
         {
@@ -36,10 +36,10 @@ public sealed class GameVisionReader : IDisposable
         }
     }
 
-    public async Task<GameVisionResult> ReadAsync(string readerName, CancellationToken cancellationToken = default)
+    public async Task<GameCaptureResult> ReadAsync(string readerName, CancellationToken cancellationToken = default)
     {
-        if (!_config.Readers.TryGetValue(readerName, out GameVisionReaderConfig? reader))
-            throw new KeyNotFoundException($"GameVision reader '{readerName}' is not configured.");
+        if (!_config.Readers.TryGetValue(readerName, out GameCaptureReaderConfig? reader))
+            throw new KeyNotFoundException($"Game capture reader '{readerName}' is not configured.");
 
         DateTimeOffset capturedAt = DateTimeOffset.UtcNow;
         byte[] imageBytes = CapturePng(_config.ExecutableName, reader.Region);
@@ -48,33 +48,33 @@ public sealed class GameVisionReader : IDisposable
         return ParseResult(readerName, reader, capturedAt, response);
     }
 
-    public async Task<GameVisionValue?> ReadValueAsync(string outputName, CancellationToken cancellationToken = default)
+    public async Task<GameCaptureValue?> ReadValueAsync(string outputName, CancellationToken cancellationToken = default)
     {
         string readerName = FindReaderName(outputName);
-        GameVisionResult result = await ReadAsync(readerName, cancellationToken);
+        GameCaptureResult result = await ReadAsync(readerName, cancellationToken);
         return result.Values.GetValueOrDefault(outputName);
     }
 
     public string GetReaderNameForOutput(string outputName) => FindReaderName(outputName);
 
-    public async Task<GameVisionSnapshot> ReadAllAsync(CancellationToken cancellationToken = default)
+    public async Task<GameCaptureSnapshot> ReadAllAsync(CancellationToken cancellationToken = default)
     {
-        var values = new Dictionary<string, GameVisionValue>(StringComparer.OrdinalIgnoreCase);
+        var values = new Dictionary<string, GameCaptureValue>(StringComparer.OrdinalIgnoreCase);
         var failures = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         foreach (string readerName in _config.Readers.Keys)
         {
-            GameVisionResult result = await ReadAsync(readerName, cancellationToken);
-            foreach ((string name, GameVisionValue value) in result.Values) values.Add(name, value);
+            GameCaptureResult result = await ReadAsync(readerName, cancellationToken);
+            foreach ((string name, GameCaptureValue value) in result.Values) values.Add(name, value);
             foreach ((string name, string failure) in result.Failures) failures.Add(name, failure);
         }
 
-        return new GameVisionSnapshot { Values = values, Failures = failures };
+        return new GameCaptureSnapshot { Values = values, Failures = failures };
     }
 
     public Bitmap CaptureReader(string readerName)
     {
-        if (!_config.Readers.TryGetValue(readerName, out GameVisionReaderConfig? reader))
-            throw new KeyNotFoundException($"GameVision reader '{readerName}' is not configured.");
+        if (!_config.Readers.TryGetValue(readerName, out GameCaptureReaderConfig? reader))
+            throw new KeyNotFoundException($"Game capture reader '{readerName}' is not configured.");
         return CaptureRegion(_config.ExecutableName, reader.Region);
     }
 
@@ -85,13 +85,13 @@ public sealed class GameVisionReader : IDisposable
     {
         if (string.IsNullOrWhiteSpace(outputName))
             throw new ArgumentException("Output name cannot be empty.", nameof(outputName));
-        foreach ((string readerName, GameVisionReaderConfig reader) in _config.Readers)
+        foreach ((string readerName, GameCaptureReaderConfig reader) in _config.Readers)
             if (reader.Outputs.ContainsKey(outputName))
                 return readerName;
-        throw new KeyNotFoundException($"GameVision output '{outputName}' is not configured.");
+        throw new KeyNotFoundException($"Game capture output '{outputName}' is not configured.");
     }
 
-    private static string BuildPrompt(GameVisionReaderConfig reader)
+    private static string BuildPrompt(GameCaptureReaderConfig reader)
     {
         string outputs = string.Join(", ", reader.Outputs.Select(pair => $"\"{pair.Key}\" ({pair.Value.Type})"));
         string prompt = string.Join(Environment.NewLine,
@@ -108,7 +108,7 @@ public sealed class GameVisionReader : IDisposable
                "\nDo not guess. No explanation or markdown.";
     }
 
-    private static object BuildResponseFormat(string readerName, GameVisionReaderConfig reader)
+    private static object BuildResponseFormat(string readerName, GameCaptureReaderConfig reader)
     {
         if (!RequiresNumericEvidence(reader))
         {
@@ -157,20 +157,20 @@ public sealed class GameVisionReader : IDisposable
         }
     };
 
-    private static bool RequiresNumericEvidence(GameVisionReaderConfig reader) =>
+    private static bool RequiresNumericEvidence(GameCaptureReaderConfig reader) =>
         reader.Outputs.Values.Any(output =>
-            output.Type is GameVisionValueType.Integer or GameVisionValueType.Decimal);
+            output.Type is GameCaptureValueType.Integer or GameCaptureValueType.Decimal);
 
-    private static string JsonType(GameVisionValueType type) => type switch
+    private static string JsonType(GameCaptureValueType type) => type switch
     {
-        GameVisionValueType.Text => "string",
-        GameVisionValueType.Integer => "integer",
-        GameVisionValueType.Decimal => "number",
-        GameVisionValueType.Boolean => "boolean",
+        GameCaptureValueType.Text => "string",
+        GameCaptureValueType.Integer => "integer",
+        GameCaptureValueType.Decimal => "number",
+        GameCaptureValueType.Boolean => "boolean",
         _ => throw new ArgumentOutOfRangeException(nameof(type))
     };
 
-    private static GameVisionResult ParseResult(string readerName, GameVisionReaderConfig reader,
+    private static GameCaptureResult ParseResult(string readerName, GameCaptureReaderConfig reader,
         DateTimeOffset capturedAt, string response)
     {
         string json = Regex.Replace(response.Trim(), @"^```(?:json)?\s*|\s*```$", string.Empty);
@@ -181,19 +181,19 @@ public sealed class GameVisionReader : IDisposable
         }
         catch (JsonException exception)
         {
-            throw new InvalidDataException($"Local AI returned invalid JSON for reader '{readerName}': {response}",
+            throw new InvalidDataException($"Vision inference returned invalid JSON for reader '{readerName}': {response}",
                 exception);
         }
 
         using (document)
         {
             if (document.RootElement.ValueKind != JsonValueKind.Object)
-                throw new InvalidDataException($"Local AI did not return an object for reader '{readerName}'.");
+                throw new InvalidDataException($"Vision inference did not return an object for reader '{readerName}'.");
             bool requiresEvidence = RequiresNumericEvidence(reader);
             JsonElement outputResults = document.RootElement;
-            var values = new Dictionary<string, GameVisionValue>(StringComparer.OrdinalIgnoreCase);
+            var values = new Dictionary<string, GameCaptureValue>(StringComparer.OrdinalIgnoreCase);
             var failures = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach ((string name, GameVisionOutputConfig output) in reader.Outputs)
+            foreach ((string name, GameCaptureOutputConfig output) in reader.Outputs)
             {
                 if (!TryGetProperty(outputResults, name, out JsonElement result))
                 {
@@ -212,7 +212,7 @@ public sealed class GameVisionReader : IDisposable
                     try
                     {
                         object directValue = ParseValue(name, output.Type, result);
-                        values[name] = new GameVisionValue(name, output.Type, directValue, readerName, capturedAt);
+                        values[name] = new GameCaptureValue(name, output.Type, directValue, readerName, capturedAt);
                     }
                     catch (InvalidDataException exception)
                     {
@@ -261,7 +261,7 @@ public sealed class GameVisionReader : IDisposable
                 {
                     object value = ParseValue(name, output.Type, valueElement);
                     ValidateConfiguredValue(name, output, value);
-                    values[name] = new GameVisionValue(name, output.Type, value, readerName, capturedAt);
+                    values[name] = new GameCaptureValue(name, output.Type, value, readerName, capturedAt);
                 }
                 catch (InvalidDataException exception)
                 {
@@ -269,31 +269,31 @@ public sealed class GameVisionReader : IDisposable
                 }
             }
 
-            return new GameVisionResult
+            return new GameCaptureResult
                 { ReaderName = readerName, CapturedAt = capturedAt, Values = values, Failures = failures };
         }
     }
 
-    private static object ParseValue(string name, GameVisionValueType type, JsonElement element) => type switch
+    private static object ParseValue(string name, GameCaptureValueType type, JsonElement element) => type switch
     {
-        GameVisionValueType.Text when element.ValueKind == JsonValueKind.String &&
+        GameCaptureValueType.Text when element.ValueKind == JsonValueKind.String &&
                                       !string.IsNullOrWhiteSpace(element.GetString()) &&
                                       !string.Equals(element.GetString(), "UNKNOWN",
                                           StringComparison.OrdinalIgnoreCase) =>
             Regex.Replace(element.GetString()!.Trim(), @"\s+", " "),
-        GameVisionValueType.Integer when element.TryGetInt64(out long integer) => integer,
-        GameVisionValueType.Decimal when element.TryGetDecimal(out decimal number) => number,
-        GameVisionValueType.Boolean when element.ValueKind is JsonValueKind.True or JsonValueKind.False => element
+        GameCaptureValueType.Integer when element.TryGetInt64(out long integer) => integer,
+        GameCaptureValueType.Decimal when element.TryGetDecimal(out decimal number) => number,
+        GameCaptureValueType.Boolean when element.ValueKind is JsonValueKind.True or JsonValueKind.False => element
             .GetBoolean(),
         _ => throw new InvalidDataException($"Output '{name}' is not a valid {type}.")
     };
 
     private static void ValidateConfiguredValue(
         string name,
-        GameVisionOutputConfig output,
+        GameCaptureOutputConfig output,
         object value)
     {
-        if (output.Type == GameVisionValueType.Integer)
+        if (output.Type == GameCaptureValueType.Integer)
         {
             long integer = (long)value;
             int digits = integer == 0
@@ -307,9 +307,9 @@ public sealed class GameVisionReader : IDisposable
                     $"Output '{name}' has {digits} digits; at most {maximumDigits} are allowed.");
         }
 
-        if (output.Type is GameVisionValueType.Integer or GameVisionValueType.Decimal)
+        if (output.Type is GameCaptureValueType.Integer or GameCaptureValueType.Decimal)
         {
-            decimal number = output.Type == GameVisionValueType.Integer ? (long)value : (decimal)value;
+            decimal number = output.Type == GameCaptureValueType.Integer ? (long)value : (decimal)value;
             if (output.Minimum is decimal minimum && number < minimum)
                 throw new InvalidDataException($"Output '{name}' is below its configured minimum of {minimum}.");
             if (output.Maximum is decimal maximum && number > maximum)
@@ -343,7 +343,7 @@ public sealed class GameVisionReader : IDisposable
     {
         try
         {
-            return await _localAi.AnalyzeImageAsync(imageBytes, prompt,
+            return await _inference.AnalyzeImageAsync(imageBytes, prompt,
                 cancellationToken: cancellationToken, responseFormat: responseFormat);
         }
         catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested)
@@ -357,8 +357,8 @@ public sealed class GameVisionReader : IDisposable
     }
 
     private InvalidOperationException CreateUnavailableException(Exception? innerException = null) => new(
-        $"Local AI is unavailable at '{_localAiConfig.BaseUrl}'. Start LM Studio, enable its local server, and load model '{_localAiConfig.Model}'.",
+        $"Vision inference is unavailable at '{_inferenceConfig.BaseUrl}'. Start LM Studio, enable its local server, and load model '{_inferenceConfig.Model}'.",
         innerException);
 
-    public void Dispose() => _localAi.Dispose();
+    public void Dispose() => _inference.Dispose();
 }

@@ -120,7 +120,7 @@ Keyboard-provider selection is infrastructure configuration and is intentionally
 
 Supported values are:
 
-- `Windows` uses `Input.Native` and the Windows `SendInput` API. It requires no additional installation. Try this first, if the target application does not receive inputs, then some anti-tampering software might be blocking he input simulations sent from Windows and you have to proceed with the below way.
+- `Windows` uses `Input.Native.WindowsKeyboardInput` and the Windows `SendInput` API. It requires no additional installation and should be tried first. If the target application rejects simulated Windows input, use the Interception provider when permitted.
 - `Interception` uses `Input.Interception` and its driver-backed scan-code injection. Install the driver from an Administrator Command Prompt and reboot before using it:
 
 ```bat
@@ -165,7 +165,7 @@ The macro editor saves only the target game and its nested action tree in `macro
 
 Supported comparison operators are `Equals`, `NotEquals`, `LessThan`, `LessThanOrEqual`, `GreaterThan`, and `GreaterThanOrEqual`. Text and boolean outputs support equality comparisons; numeric outputs support all operators.
 
-### Example saved Vision.GameCapture format
+### Vision capture configuration
 
 The `Vision.RegionEditor` application calculates capture regions for the parts of the game HUD the vision model needs to read. Those selections are stored in [`Vision.GameCapture/gamevision.json`](Vision.GameCapture/gamevision.json). The current example targets a popular MMORPG. Coordinates are initially supplied by the user, then adjusted in the editor until the intended area is captured precisely.
 
@@ -223,7 +223,7 @@ Use the coordinate-calculation GUI to create or adjust regions rather than calcu
 
 ### Saved local-model format
 
-The default adapter expects an OpenAI-compatible server at `http://localhost:1234/v1`:
+`Vision.Inference.InferenceClient` expects an OpenAI-compatible server at `http://localhost:1234/v1` by default. Its settings are represented by `InferenceConfig` and loaded from `localai.json`:
 
 ```json
 {
@@ -243,11 +243,11 @@ Select the model exposed by your local server during setup. No model files, GPU 
 | Project | Responsibility |
 | --- | --- |
 | `TheUnseenHand` | Gamer-facing WPF macro creator, profiles, and gameplay-loop execution |
-| `Input.Abstractions` | Shared `IKeyboardInput` contract and the independent `input.json` provider configuration |
-| `Input.Native` | Windows target-window discovery and `SendInput`-based keyboard input |
-| `Input.Interception` | Interception driver-backed scan-code input and driver installation assets |
-| `Vision.GameCapture` | Foreground-window capture, region handling, and typed recognition |
-| `Vision.Inference` | Image and prompt requests to an OpenAI-compatible local endpoint |
+| `Input.Abstractions` | Shared `IKeyboardInput` contract, `KeyboardProvider`, `InputSettings`, and independent `input.json` configuration |
+| `Input.Native` | `WindowsKeyboardInput`, target-window discovery, and `SendInput`-based keyboard input |
+| `Input.Interception` | `InterceptionKeyboardInput`, driver-backed scan-code input, and driver installation assets |
+| `Vision.GameCapture` | `GameCaptureReader`, capture configuration, region handling, typed values, and recognition results |
+| `Vision.Inference` | `InferenceClient` and `InferenceConfig` for OpenAI-compatible local vision requests |
 | `Vision.RegionEditor` | Capture-region editing, preview, and recognition diagnostics |
 
 

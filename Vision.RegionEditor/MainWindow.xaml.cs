@@ -17,10 +17,10 @@ public partial class MainWindow : Window
         {
             string readerName = GetReaderName();
             await PrepareCaptureAsync($"testing reader '{readerName}'");
-            using var vision = new GameVisionReader();
-            using Bitmap capture = vision.CaptureReader(readerName);
+            using var gameCapture = new GameCaptureReader();
+            using Bitmap capture = gameCapture.CaptureReader(readerName);
             PreviewImage.Source = BitmapToImageSource(capture);
-            GameVisionResult result = await vision.ReadAsync(readerName);
+            GameCaptureResult result = await gameCapture.ReadAsync(readerName);
             ResultTextBox.Text = FormatResult(result.Values, result.Failures);
         }
         catch (Exception exception)
@@ -34,8 +34,8 @@ public partial class MainWindow : Window
         try
         {
             await PrepareCaptureAsync("reading all configured readers");
-            using var vision = new GameVisionReader();
-            GameVisionSnapshot snapshot = await vision.ReadAllAsync();
+            using var gameCapture = new GameCaptureReader();
+            GameCaptureSnapshot snapshot = await gameCapture.ReadAllAsync();
             PreviewImage.Source = null;
             ResultTextBox.Text = FormatResult(snapshot.Values, snapshot.Failures);
         }
@@ -68,7 +68,7 @@ public partial class MainWindow : Window
     }
 
     private static string FormatResult(
-        IReadOnlyDictionary<string, GameVisionValue> values,
+        IReadOnlyDictionary<string, GameCaptureValue> values,
         IReadOnlyDictionary<string, string> failures)
     {
         var publishedValues = values.ToDictionary(

@@ -6,7 +6,7 @@ namespace Input.Interception;
 /// <summary>
 /// Sends scan-code input through the Interception keyboard filter driver.
 /// </summary>
-public static class KeyboardInput
+internal static class InterceptionKeyboardSender
 {
     private const ushort KeyUp = 0x01;
     private const ushort KeyE0 = 0x02;

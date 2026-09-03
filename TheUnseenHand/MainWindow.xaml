@@ -260,7 +260,7 @@
                     </Button.Template>
                 </Button>
             </Grid>
-            <ListBox ItemsSource="{Binding GameVisionValues}"
+                <ListBox ItemsSource="{Binding GameCaptureValues}"
                      Background="Transparent"
                      BorderThickness="1"
                      Foreground="White"

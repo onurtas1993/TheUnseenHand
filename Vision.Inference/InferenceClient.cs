@@ -4,18 +4,18 @@ using System.Text.Json;
 
 namespace Vision.Inference;
 
-public sealed class LocalAIClient : IDisposable
+public sealed class InferenceClient : IDisposable
 {
-    private readonly LocalAIConfig _config;
+    private readonly InferenceConfig _config;
     private readonly HttpClient _httpClient;
     private readonly bool _ownsHttpClient;
 
-    public LocalAIClient(string configPath = "localai.json")
-        : this(LocalAIConfig.Load(configPath), null)
+    public InferenceClient(string configPath = "localai.json")
+        : this(InferenceConfig.Load(configPath), null)
     {
     }
 
-    public LocalAIClient(LocalAIConfig config, HttpClient? httpClient = null)
+    public InferenceClient(InferenceConfig config, HttpClient? httpClient = null)
     {
         _config = config ?? throw new ArgumentNullException(nameof(config));
         _ownsHttpClient = httpClient is null;
@@ -215,7 +215,7 @@ public sealed class LocalAIClient : IDisposable
             _httpClient.Dispose();
     }
 
-    private static HttpClient CreateHttpClient(LocalAIConfig config)
+    private static HttpClient CreateHttpClient(InferenceConfig config)
     {
         var handler = new SocketsHttpHandler();
 

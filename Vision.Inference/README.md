@@ -1,6 +1,6 @@
 # Vision.Inference
 
-Minimal .NET class library for forwarding image + prompt requests to a local LM Studio server using its OpenAI-compatible Chat Completions endpoint.
+Minimal .NET class library for forwarding image and prompt requests to a local LM Studio server using its OpenAI-compatible Chat Completions endpoint.
 
 ## Requirements
 
@@ -15,11 +15,16 @@ No LLamaSharp, GGUF loading, CUDA, Vulkan, or model files are handled by this li
 ```csharp
 using Vision.Inference;
 
-using var ai = new LocalAIClient("localai.json");
+using var inference = new InferenceClient("localai.json");
 
-var result = await ai.AnalyzeImageAsync(
+var result = await inference.AnalyzeImageAsync(
     imageBytes,
     "Read only the mob name. Return only the exact text.");
 ```
 
 `imageBytes` should contain PNG, JPEG, or WebP data. The default overload assumes PNG; pass the MIME type explicitly if needed.
+
+`InferenceConfig.Load()` validates and loads `localai.json`. `InferenceClient`
+owns its internally created `HttpClient`, supports model-availability checks,
+and should be disposed after use. A caller-supplied `HttpClient` remains owned
+by the caller.

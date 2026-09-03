@@ -78,7 +78,7 @@ public partial class MainWindow : Window
             selectedAction.Condition = editor.Result.Condition;
             selectedAction.Actions = editor.Result.Actions;
             selectedAction.ElseActions = editor.Result.ElseActions;
-            viewModel.RefreshGameVisionValues();
+            viewModel.RefreshGameCaptureValues();
             viewModel.RefreshMacroTree();
         }
     }

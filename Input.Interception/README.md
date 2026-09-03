@@ -2,7 +2,22 @@
 
 `Input.Interception` sends keyboard scan codes through the Interception v1.0.1
 keyboard filter driver. It is intended for software that ignores user-mode
-`SendInput` input.
+`SendInput` events.
+
+## Public API
+
+`InterceptionKeyboardInput` implements the shared `IKeyboardInput` contract:
+
+```csharp
+using Input.Abstractions;
+using Input.Interception;
+
+IKeyboardInput keyboard = new InterceptionKeyboardInput();
+await keyboard.HoldAsync("W", 500);
+```
+
+Provider selection belongs to `Input.Abstractions/input.json`; it is not stored
+in application macro profiles.
 
 ## Driver installation
 
@@ -10,6 +25,9 @@ keyboard filter driver. It is intended for software that ignores user-mode
 2. Change to the `Input.Interception/tools` directory.
 3. Run `install-interception.exe /install`.
 4. Reboot Windows.
+
+To uninstall the driver, run `install-interception.exe /uninstall` from the
+same elevated prompt and reboot again.
 
 Driver installation changes Windows system state and is deliberately not part
 of the application build or startup. Do not install or use input-injection

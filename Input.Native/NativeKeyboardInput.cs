@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Input.Native;
 
-public static class KeyboardInput
+public static class NativeKeyboardInput
 {
     public static async Task TapAsync(
         string key,
